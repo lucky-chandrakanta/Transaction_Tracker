@@ -1,0 +1,3770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tracker App</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg1:#070d1a;
+  --bg2:#010409;
+  --bg3:#0a1428;
+  --card:rgba(8,14,30,.72);
+  --card2:rgba(4,8,20,.82);
+  --card-hi:rgba(12,20,40,.68);
+  --border:rgba(148,163,184,.13);
+  --border2:rgba(99,179,237,.32);
+  --border-hi:rgba(147,197,253,.22);
+  --text:#e8edf5;
+  --muted:#7a92b0;
+  --muted2:#566a82;
+  --accent:#3b82f6;
+  --accent2:#60a5fa;
+  --accent3:#93c5fd;
+  --accent-glow:rgba(59,130,246,.35);
+  --good:#10b981;
+  --good2:#34d399;
+  --bad:#ef4444;
+  --bad2:#f87171;
+  --gold:#f59e0b;
+  --purple:#8b5cf6;
+  --purple2:#a78bfa;
+  --cyan:#06b6d4;
+  --shadow:0 24px 64px rgba(0,0,0,.72), 0 8px 24px rgba(0,0,0,.5);
+  --shadow-blue:0 20px 60px rgba(37,99,235,.22), 0 8px 24px rgba(0,0,0,.45);
+  --shadow-card:0 2px 8px rgba(0,0,0,.36), 0 16px 40px rgba(0,0,0,.48);
+  --radius-xl:26px;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --glass:rgba(255,255,255,.028);
+  --glass2:rgba(255,255,255,.048);
+  --lock-cursor: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='4' y1='4' x2='28' y2='28' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%233b82f6'/%3E%3Cstop offset='.5' stop-color='%2360a5fa'/%3E%3Cstop offset='1' stop-color='%2322c55e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='8' y='13' width='17' height='13' rx='3.2' fill='url(%23g)' stroke='%23e2e8f0' stroke-opacity='.9' stroke-width='1.2'/%3E%3Cpath d='M11 13V10a5.3 5.3 0 0 1 10.6 0v3' fill='none' stroke='url(%23g)' stroke-width='2.3' stroke-linecap='round'/%3E%3Ccircle cx='16.5' cy='19.5' r='1.7' fill='%23f8fafc'/%3E%3C/svg%3E") 12 12, not-allowed;
+}
+
+/* ── RESET & BASE ──────────────────────────────────────────────────── */
+html,body{height:100%}
+html{
+  background:var(--bg2);
+  scroll-behavior:auto;
+}
+body{
+  margin:0;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--text);
+  height:100vh;
+  overflow:hidden;
+  overscroll-behavior:none;
+  overflow-anchor:none;
+  background:radial-gradient(ellipse 120% 80% at 20% 0%,#0c1a38 0%,transparent 55%),
+             radial-gradient(ellipse 80% 60% at 80% 100%,#080e22 0%,transparent 50%),
+             var(--bg2);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  font-feature-settings:'ss01','cv05','cv08';
+}
+
+/* Ambient glow orbs */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 8%, rgba(59,130,246,.09) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 35% at 88% 6%,  rgba(99,102,241,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 45% at 50% 92%, rgba(6,182,212,.055) 0%, transparent 55%),
+    radial-gradient(ellipse 30% 25% at 5%  85%, rgba(139,92,246,.06) 0%, transparent 50%);
+  pointer-events:none;
+  z-index:0;
+}
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:
+    radial-gradient(circle 1px at 1px 1px, rgba(148,163,184,.042) 0%, transparent 0%);
+  background-size:32px 32px;
+  pointer-events:none;
+  z-index:0;
+  opacity:.9;
+}
+
+/* ── SCROLLBARS ──────────────────────────────────────────────────────*/
+*{scrollbar-width:thin;scrollbar-color:rgba(99,179,237,.22) transparent}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{
+  background:rgba(99,179,237,.22);
+  border-radius:999px;
+}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ── SHELL ───────────────────────────────────────────────────────────*/
+.app-shell{
+  width:min(1400px, calc(100% - 20px));
+  height:calc(100vh - 40px);
+  margin:14px auto 26px;
+  padding-bottom:6px;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  box-sizing:border-box;
+  z-index:1;
+}
+
+/* ── NAV ─────────────────────────────────────────────────────────────*/
+.nav{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+  padding:6px;
+  background:linear-gradient(145deg,
+    rgba(8,14,30,.96) 0%,
+    rgba(4,8,20,.92) 100%);
+  border:1px solid rgba(148,163,184,.1);
+  border-radius:var(--radius-xl);
+  backdrop-filter:blur(28px) saturate(1.4);
+  -webkit-backdrop-filter:blur(28px) saturate(1.4);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.05) inset,
+    0 -1px 0 rgba(0,0,0,.5) inset,
+    0 28px 70px rgba(0,0,0,.7),
+    0 4px 16px rgba(0,0,0,.4);
+  position:sticky;
+  top:14px;
+  z-index:30;
+  overflow:hidden;
+  isolation:isolate;
+}
+.nav::before{
+  content:"";
+  position:absolute;
+  inset:-80% auto auto -5%;
+  width:380px;
+  height:380px;
+  background:radial-gradient(circle, rgba(59,130,246,.11) 0%, transparent 68%);
+  pointer-events:none;
+}
+.nav-indicator{
+  position:absolute;
+  left:6px;
+  top:6px;
+  width:0;
+  height:calc(100% - 12px);
+  border-radius:20px;
+  background:linear-gradient(135deg,
+    rgba(37,99,235,.22) 0%,
+    rgba(59,130,246,.16) 50%,
+    rgba(96,165,250,.1) 100%);
+  border:1px solid rgba(147,197,253,.18);
+  box-shadow:
+    0 0 24px rgba(59,130,246,.22),
+    0 8px 32px rgba(37,99,235,.18),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  pointer-events:none;
+  opacity:0;
+  transition:transform .52s cubic-bezier(.2,.9,.2,1), width .52s cubic-bezier(.2,.9,.2,1), opacity .28s ease, height .52s cubic-bezier(.2,.9,.2,1);
+  z-index:0;
+}
+.nav button{
+  position:relative;
+  z-index:1;
+  min-width:0;
+  background:transparent;
+  border:1px solid transparent;
+  color:var(--muted);
+  cursor:pointer;
+  font-size:13.5px;
+  font-weight:700;
+  letter-spacing:.25px;
+  padding:13px 10px;
+  border-radius:20px;
+  transition:color .2s ease, background .22s ease, border-color .22s ease, transform .18s ease, box-shadow .18s ease;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  text-align:center;
+  line-height:1;
+}
+.nav button svg{width:16px;height:16px;flex:0 0 auto;transition:transform .22s ease,opacity .22s ease}
+.nav button:hover{
+  color:#c7d9f0;
+  background:rgba(255,255,255,.042);
+  border-color:rgba(148,163,184,.1);
+}
+.nav button:hover svg{transform:scale(1.1)}
+.nav button.active{
+  color:#fff;
+  background:transparent;
+  border-color:transparent;
+  text-shadow:0 0 22px rgba(147,197,253,.55);
+}
+.nav button.active svg{
+  filter:drop-shadow(0 0 6px rgba(147,197,253,.6));
+  transform:scale(1.06);
+}
+.nav button.active::after{
+  content:"";
+  position:absolute;
+  left:22px; right:22px; bottom:7px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(147,197,253,.8), transparent);
+  box-shadow:0 0 10px rgba(147,197,253,.4);
+}
+.nav button:active{transform:scale(.96)}
+
+/* ── STAGE ───────────────────────────────────────────────────────────*/
+.stage-shell{
+  margin-top:10px;
+  flex:1;
+  min-height:0;
+  position:relative;
+  border-radius:32px;
+  background:linear-gradient(145deg,
+    rgba(59,130,246,.16) 0%,
+    rgba(15,23,42,.12) 18%,
+    rgba(8,14,28,.04) 60%,
+    rgba(139,92,246,.09) 100%);
+  padding:1.5px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.03), 0 32px 80px rgba(0,0,0,.65);
+  overflow:hidden;
+}
+.stage-shell::before{
+  content:"";
+  position:absolute;
+  inset:-15% auto auto -8%;
+  width:400px;
+  height:400px;
+  background:radial-gradient(circle, rgba(59,130,246,.1) 0%, transparent 65%);
+  pointer-events:none;
+  z-index:0;
+}
+.stage-shell::after{
+  content:"";
+  position:absolute;
+  bottom:-10%;
+  right:-5%;
+  width:300px;
+  height:300px;
+  background:radial-gradient(circle, rgba(139,92,246,.07) 0%, transparent 65%);
+  pointer-events:none;
+  z-index:0;
+}
+.stage{
+  position:relative;
+  height:100%;
+  overflow:hidden;
+  border-radius:31px;
+  background:linear-gradient(180deg,
+    rgba(6,10,22,.98) 0%,
+    rgba(8,14,26,.97) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04), inset 0 0 0 1px rgba(0,0,0,.3);
+  will-change:transform;
+  min-height:0;
+  z-index:1;
+}
+
+/* ── SECTIONS ────────────────────────────────────────────────────────*/
+.section{
+  position:absolute;
+  inset:0;
+  display:none;
+  padding:22px;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(20px) scale(.993);
+  pointer-events:none;
+  transition:opacity .36s cubic-bezier(.2,.9,.2,1), transform .48s cubic-bezier(.2,.9,.2,1), visibility 0s linear .36s;
+  will-change:opacity,transform;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+  -webkit-overflow-scrolling:touch;
+}
+.section.active{
+  display:block; opacity:1; visibility:visible;
+  transform:translateY(0) scale(1); pointer-events:auto;
+  transition:opacity .36s cubic-bezier(.2,.9,.2,1), transform .48s cubic-bezier(.2,.9,.2,1), visibility 0s;
+}
+.section.leaving{
+  display:block; opacity:0; visibility:visible; pointer-events:none;
+}
+
+/* ── BASE ELEMENTS ───────────────────────────────────────────────────*/
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+  transition:transform .16s cubic-bezier(.2,.9,.2,1), box-shadow .18s ease, background .18s ease, opacity .18s ease, border-color .18s ease, filter .18s ease;
+  font-weight:600;
+  font-size:13px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  text-align:center;
+  line-height:1.1;
+  white-space:nowrap;
+  font-family:inherit;
+}
+button svg{width:15px;height:15px;flex:0 0 auto}
+button:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,0,0,.35)}
+button:active{transform:translateY(0) scale(.977)}
+
+button:disabled{
+  opacity:.46;
+  filter:saturate(.7) grayscale(.18);
+  cursor:var(--lock-cursor);
+  pointer-events:auto;
+  transform:none !important;
+  box-shadow:none !important;
+}
+button:disabled:hover{cursor:var(--lock-cursor)}
+input:disabled,textarea:disabled,select:disabled{
+  opacity:.46;filter:saturate(.7) grayscale(.18);
+  cursor:not-allowed;pointer-events:auto;
+  transform:none !important;box-shadow:none !important;
+}
+input:disabled:hover,textarea:disabled:hover,select:disabled:hover{cursor:not-allowed}
+
+.action-btn:disabled,.action-btn.file-button.disabled{
+  opacity:.46;filter:saturate(.7) grayscale(.18);
+  cursor:var(--lock-cursor) !important;
+  background:rgba(8,14,28,.7);
+  border-color:rgba(148,163,184,.1);
+  box-shadow:none;
+}
+.action-btn:disabled *,.action-btn.file-button.disabled *{cursor:var(--lock-cursor) !important}
+.action-btn.file-button.disabled::after{
+  content:"";position:absolute;inset:0;
+  background:rgba(0,0,0,.15);pointer-events:none;
+}
+.action-btn:disabled:hover,.action-btn.file-button.disabled:hover{
+  transform:none !important; box-shadow:none !important;
+}
+
+/* Booting suppression */
+body.booting .section,body.booting .stage,body.booting .nav-indicator{transition:none !important}
+body.booting .item-card{animation:none !important}
+
+/* ── PRIMARY VARIANTS ─────────────────────────────────────────────── */
+.primary{
+  background:linear-gradient(135deg,#2563eb 0%,#3b82f6 50%,#60a5fa 100%);
+  color:#fff;
+  border:1px solid rgba(147,197,253,.28);
+  box-shadow:0 4px 20px rgba(37,99,235,.35), inset 0 1px 0 rgba(255,255,255,.18);
+  text-shadow:0 1px 2px rgba(0,0,0,.3);
+}
+.primary:hover{
+  background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 50%,#3b82f6 100%);
+  box-shadow:0 8px 28px rgba(37,99,235,.5), 0 2px 8px rgba(0,0,0,.3);
+}
+.secondary{
+  background:linear-gradient(160deg, rgba(12,20,40,.9) 0%, rgba(6,10,22,.95) 100%);
+  color:var(--text);
+  border:1px solid rgba(148,163,184,.14);
+  box-shadow:0 2px 8px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.secondary:hover{
+  border-color:rgba(99,179,237,.28);
+  background:linear-gradient(160deg, rgba(16,26,52,.9) 0%, rgba(8,14,28,.95) 100%);
+}
+.danger{
+  background:linear-gradient(135deg,#dc2626 0%,#ef4444 60%,#f87171 100%);
+  color:#fff;
+  border:1px solid rgba(239,68,68,.3);
+  box-shadow:0 4px 18px rgba(220,38,38,.35), inset 0 1px 0 rgba(255,255,255,.14);
+  text-shadow:0 1px 2px rgba(0,0,0,.3);
+}
+
+/* ── INPUTS ──────────────────────────────────────────────────────────*/
+input,textarea,select{
+  width:100%;
+  padding:11px 14px;
+  margin:5px 0;
+  border-radius:var(--radius-md);
+  border:1px solid rgba(148,163,184,.16);
+  background:rgba(4,8,20,.88);
+  color:#e8edf5;
+  outline:none;
+  font-family:inherit;
+  font-size:13.5px;
+  transition:.2s ease;
+  box-shadow:0 2px 6px rgba(0,0,0,.3) inset, 0 1px 0 rgba(255,255,255,.03);
+}
+input:focus,textarea:focus,select:focus{
+  border-color:rgba(99,179,237,.55);
+  box-shadow:0 0 0 3px rgba(59,130,246,.1) ,0 2px 6px rgba(0,0,0,.3) inset;
+  background:rgba(6,10,24,.92);
+}
+input::placeholder,textarea::placeholder{color:var(--muted2)}
+select option{background:#0a1428;color:#e8edf5}
+
+/* ── CARDS ───────────────────────────────────────────────────────────*/
+.card{
+  background:linear-gradient(145deg,
+    rgba(10,17,36,.78) 0%,
+    rgba(6,10,22,.85) 100%);
+  backdrop-filter:blur(22px) saturate(1.3);
+  -webkit-backdrop-filter:blur(22px) saturate(1.3);
+  border:1px solid rgba(148,163,184,.1);
+  border-radius:var(--radius-lg);
+  padding:18px;
+  box-shadow:var(--shadow-card);
+  transition:.24s cubic-bezier(.2,.9,.2,1);
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(147,197,253,.55) 40%,
+    rgba(99,179,237,.4) 60%,
+    transparent 100%);
+  opacity:.7;
+  pointer-events:none;
+}
+.card::after{
+  content:"";
+  position:absolute;
+  top:-80px;left:-80px;
+  width:240px;height:240px;
+  background:radial-gradient(circle, rgba(59,130,246,.055) 0%, transparent 68%);
+  pointer-events:none;
+}
+.card:hover{
+  border-color:rgba(99,179,237,.2);
+  transform:translateY(-4px);
+  box-shadow:0 8px 32px rgba(37,99,235,.12), 0 20px 50px rgba(0,0,0,.55),
+             0 0 0 1px rgba(99,179,237,.08);
+  background:linear-gradient(145deg,
+    rgba(12,20,42,.82) 0%,
+    rgba(8,14,28,.88) 100%);
+}
+
+/* ── SETTINGS GRID ───────────────────────────────────────────────────*/
+.settings-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+  margin-top:16px;
+}
+.setting-note{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.65;
+  margin-top:8px;
+}
+.setting-note code{
+  background:rgba(59,130,246,.1);
+  color:#93c5fd;
+  border:1px solid rgba(59,130,246,.2);
+  border-radius:5px;
+  padding:1px 6px;
+  font-size:11px;
+  font-family:ui-monospace,'SF Mono',Consolas,monospace;
+}
+.setting-divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(148,163,184,.18),transparent);
+  margin:14px 0;
+}
+
+/* ── LIST GRID ───────────────────────────────────────────────────────*/
+.list-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+  gap:16px;
+  margin-top:16px;
+}
+
+/* ── ITEM CARDS ──────────────────────────────────────────────────────*/
+.item-card{
+  background:linear-gradient(145deg,
+    rgba(10,17,36,.8) 0%,
+    rgba(6,10,22,.88) 100%);
+  backdrop-filter:blur(18px) saturate(1.2);
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);
+  border:1px solid rgba(148,163,184,.1);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:var(--shadow-card);
+  opacity:0;
+  transform:translateY(22px) scale(.98);
+  animation:fadeInUp .38s cubic-bezier(.2,.9,.2,1) forwards;
+  position:relative;
+  overflow:hidden;
+  transition:transform .24s cubic-bezier(.2,.9,.2,1), box-shadow .24s ease, border-color .24s ease, filter .24s ease;
+}
+/* Top accent line — colour shifts by card type via JS-set data attr */
+.item-card::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;right:0;
+  height:2.5px;
+  background:var(--card-stripe, linear-gradient(90deg,rgba(59,130,246,.2),rgba(96,165,250,.9),rgba(59,130,246,.2)));
+  border-radius:18px 18px 0 0;
+}
+/* Corner ambient glow */
+.item-card::after{
+  content:"";
+  position:absolute;
+  right:-40px;bottom:-40px;
+  width:140px;height:140px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(59,130,246,.08) 0%, transparent 68%);
+  pointer-events:none;
+  transition:opacity .24s ease;
+}
+.item-card[data-type="taken"]::before{
+  --card-stripe:linear-gradient(90deg,rgba(59,130,246,.15),rgba(96,165,250,.9),rgba(59,130,246,.15));
+}
+.item-card[data-type="taken"]::after{
+  background:radial-gradient(circle, rgba(59,130,246,.09) 0%, transparent 68%);
+}
+.item-card[data-type="returned"]::before{
+  --card-stripe:linear-gradient(90deg,rgba(16,185,129,.15),rgba(52,211,153,.9),rgba(16,185,129,.15));
+}
+.item-card[data-type="returned"]::after{
+  background:radial-gradient(circle, rgba(16,185,129,.09) 0%, transparent 68%);
+}
+.item-card:hover{
+  border-color:rgba(99,179,237,.24);
+  transform:translateY(-9px) scale(1.018);
+  box-shadow:0 4px 16px rgba(0,0,0,.2), 0 24px 56px rgba(0,0,0,.6), 0 0 0 1px rgba(99,179,237,.1);
+  filter:brightness(1.04);
+}
+.item-card:hover::after{opacity:1.6}
+.item-card:hover .preview-img{transform:scale(1.03); filter:saturate(1.08) brightness(1.04)}
+
+/* Card internals */
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-size:12.5px;
+  color:var(--muted);
+  margin-bottom:8px;
+}
+.date-text{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  color:#8ba4c2;
+  cursor:default;
+  font-size:12px;
+  font-weight:500;
+  letter-spacing:.2px;
+}
+.amt{
+  font-size:22px;
+  font-weight:800;
+  margin:0 0 5px;
+  letter-spacing:-.3px;
+  line-height:1.1;
+}
+.item-card[data-type="taken"] .amt{
+  background:linear-gradient(135deg,#93c5fd,#60a5fa);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.item-card[data-type="returned"] .amt{
+  background:linear-gradient(135deg,#6ee7b7,#34d399);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.desc{
+  font-size:12.5px;
+  color:#8ba4c2;
+  line-height:1.6;
+  white-space:pre-wrap;
+  margin-top:3px;
+}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:3px 10px;
+  border-radius:999px;
+  font-size:10.5px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+  white-space:nowrap;
+}
+.taken{
+  background:linear-gradient(135deg,rgba(30,58,138,.75),rgba(37,99,235,.5));
+  color:#bfdbfe;
+  border:1px solid rgba(59,130,246,.22);
+  box-shadow:0 2px 8px rgba(37,99,235,.2), inset 0 1px 0 rgba(147,197,253,.12);
+}
+.returned{
+  background:linear-gradient(135deg,rgba(6,78,59,.75),rgba(16,185,129,.45));
+  color:#a7f3d0;
+  border:1px solid rgba(16,185,129,.22);
+  box-shadow:0 2px 8px rgba(16,185,129,.2), inset 0 1px 0 rgba(110,231,183,.12);
+}
+.actions{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+}
+.actions button{
+  flex:1;
+  font-size:11.5px;
+  padding:8px 10px;
+  border-radius:11px;
+}
+
+/* ── EVIDENCE IMAGE ──────────────────────────────────────────────────*/
+.preview-img{
+  width:100%;
+  height:124px;
+  object-fit:cover;
+  border-radius:13px;
+  margin-top:12px;
+  cursor:pointer;
+  transition:transform .3s cubic-bezier(.2,.9,.2,1), box-shadow .3s ease, border-color .3s ease, filter .3s ease;
+  box-shadow:0 8px 24px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.04);
+  border:1px solid rgba(148,163,184,.18);
+  background:rgba(6,10,22,.6);
+  padding:2px;
+  will-change:transform;
+}
+.preview-img:hover{
+  transform:translateY(-2px) scale(1.02);
+  box-shadow:0 14px 36px rgba(0,0,0,.55), 0 4px 16px rgba(59,130,246,.15);
+  border-color:rgba(99,179,237,.4);
+}
+
+/* ── DASHBOARD ───────────────────────────────────────────────────────*/
+.dashboard-cards{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+.stat{
+  flex:1;
+  min-width:155px;
+  background:linear-gradient(160deg,rgba(9,15,33,.88) 0%,rgba(5,9,22,.93) 100%);
+  border:1px solid rgba(148,163,184,.1);
+  padding:22px 20px 18px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.35),0 14px 36px rgba(0,0,0,.5);
+  position:relative;
+  overflow:hidden;
+  transition:transform .28s cubic-bezier(.2,.9,.2,1),
+             box-shadow .28s ease,
+             border-color .28s ease;
+  cursor:default;
+  isolation:isolate;
+}
+/* Top shimmer line — colour set per-card via inline style */
+.stat::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:2px;
+  background:var(--stat-line, linear-gradient(90deg,transparent,rgba(147,197,253,.7),transparent));
+  border-radius:20px 20px 0 0;
+  pointer-events:none;
+}
+/* Ambient top glow */
+.stat::after{
+  content:"";
+  position:absolute;
+  top:-50px;left:50%;
+  transform:translateX(-50%);
+  width:200px;height:130px;
+  background:var(--stat-glow, radial-gradient(ellipse,rgba(59,130,246,.09) 0%,transparent 70%));
+  pointer-events:none;
+}
+/* Load-in shimmer sweep */
+@keyframes statShimmer{
+  0%  {opacity:0;transform:translateX(-100%) skewX(-20deg)}
+  40% {opacity:1}
+  100%{opacity:0;transform:translateX(300%) skewX(-20deg)}
+}
+/* Dashboard chart entrance helpers */
+@keyframes dashFadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes dashFadeInUp{
+  from{opacity:0;transform:translateY(6px) scale(.92)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.stat .shimmer-sweep{
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 35%,rgba(255,255,255,.07) 50%,transparent 65%);
+  animation:statShimmer .8s ease both;
+  pointer-events:none;
+  z-index:1;
+}
+.stat:hover{
+  transform:translateY(-7px) scale(1.012);
+  box-shadow:0 12px 36px rgba(37,99,235,.14),
+             0 24px 56px rgba(0,0,0,.62),
+             0 0 0 1px rgba(99,179,237,.1);
+  border-color:rgba(99,179,237,.2);
+}
+.stat span{
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:.9px;
+  text-transform:uppercase;
+  color:var(--muted2);
+}
+.stat h2{
+  margin:8px 0 0;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-.5px;
+  line-height:1;
+}
+.stat-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:42px;height:42px;border-radius:13px;margin-bottom:12px;
+  font-size:18px;position:relative;z-index:1;
+  transition:transform .22s cubic-bezier(.2,.9,.2,1);
+}
+.stat:hover .stat-icon{transform:scale(1.12) translateY(-1px)}
+.empty{
+  text-align:center;margin-top:60px;
+  color:var(--muted2);font-size:14px;line-height:1.7;
+}
+
+/* ── PROGRESS BAR ────────────────────────────────────────────────────*/
+.progress-wrap{
+  position:relative;
+  height:14px;
+  background:rgba(3,6,18,.92);
+  border-radius:999px;
+  overflow:hidden;
+  box-shadow:inset 0 2px 7px rgba(0,0,0,.65),
+             inset 0 1px 3px rgba(0,0,0,.45);
+  border:1px solid rgba(148,163,184,.07);
+}
+/* Tick marks at 25 / 50 / 75 */
+.progress-wrap::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg, transparent 24.8%, rgba(255,255,255,.055) 25%, transparent 25.2%),
+    linear-gradient(90deg, transparent 49.8%, rgba(255,255,255,.07)  50%, transparent 50.2%),
+    linear-gradient(90deg, transparent 74.8%, rgba(255,255,255,.055) 75%, transparent 75.2%);
+  pointer-events:none;
+  z-index:2;
+  border-radius:999px;
+}
+.progress-fill{
+  height:100%;border-radius:999px;
+  transition:width 1.2s cubic-bezier(.2,.9,.2,1);
+  position:relative;overflow:hidden;
+  z-index:1;
+}
+/* Glass gloss on top half */
+.progress-fill::before{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.24) 0%,transparent 55%);
+  border-radius:999px;pointer-events:none;
+}
+/* Animated shine sweep */
+.progress-fill::after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 15%,rgba(255,255,255,.34) 50%,transparent 85%);
+  animation:progressShine 2.4s ease-in-out infinite;
+}
+@keyframes progressShine{
+  0%  {transform:translateX(-120%)}
+  100%{transform:translateX(200%)}
+}
+
+/* ── MODALS ──────────────────────────────────────────────────────────*/
+#formModal,#imgModal,#msgModal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translateZ(0);
+  transition:opacity .3s ease, visibility .3s ease;
+}
+#formModal,#msgModal{
+  background:rgba(1,3,10,.72);
+  backdrop-filter:blur(14px) saturate(1.5);
+  -webkit-backdrop-filter:blur(14px) saturate(1.5);
+}
+#imgModal{
+  background:rgba(0,0,0,.82);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+#imgModal img{
+  max-width:min(94vw,1100px);
+  max-height:90vh;
+  border-radius:18px;
+  box-shadow:0 30px 70px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.06);
+  opacity:0;
+  transform:scale(.94) translateY(16px);
+  transition:opacity .36s cubic-bezier(.2,.9,.2,1), transform .36s cubic-bezier(.2,.9,.2,1);
+  cursor:default;
+}
+#msgModal .modal-box{width:min(92vw,460px)}
+#imgModal.show img{opacity:1;transform:scale(1) translateY(0)}
+#imgModal.closing img{opacity:0;transform:scale(.94) translateY(16px)}
+#formModal.show,#msgModal.show,#imgModal.show{opacity:1;visibility:visible;pointer-events:auto}
+#formModal.closing,#msgModal.closing,#imgModal.closing{opacity:0;visibility:visible;pointer-events:none}
+#imgModal{display:none;cursor:zoom-out}
+
+/* ── MODAL BOX ───────────────────────────────────────────────────────*/
+.modal-box{
+  width:min(92vw,400px);
+  background:linear-gradient(160deg,
+    rgba(8,14,32,.97) 0%,
+    rgba(10,17,36,.95) 100%);
+  border:1px solid rgba(148,163,184,.14);
+  border-radius:var(--radius-lg);
+  box-shadow:
+    0 2px 0 rgba(255,255,255,.05) inset,
+    0 32px 80px rgba(0,0,0,.78),
+    0 8px 24px rgba(0,0,0,.55),
+    0 0 80px rgba(59,130,246,.06);
+  padding:22px;
+  transform:scale(.9) translateY(28px);
+  opacity:0;
+  transition:transform .36s cubic-bezier(.2,.9,.2,1), box-shadow .22s ease, border-color .22s ease, opacity .28s ease;
+  position:relative;
+  overflow:hidden;
+}
+.modal-box::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;right:0;
+  height:1.5px;
+  background:linear-gradient(90deg,transparent,rgba(147,197,253,.7),rgba(99,179,237,.5),transparent);
+  opacity:.85;
+}
+.modal-box::after{
+  content:"";
+  position:absolute;
+  top:-100px;left:-80px;
+  width:280px;height:200px;
+  background:radial-gradient(ellipse, rgba(59,130,246,.07) 0%, transparent 70%);
+  pointer-events:none;
+}
+#formModal.show .modal-box,#msgModal.show .modal-box{transform:scale(1) translateY(0);opacity:1}
+#formModal.closing .modal-box,#msgModal.closing .modal-box{transform:scale(.9) translateY(28px);opacity:0}
+
+/* Morph animation */
+@keyframes originMorphIn{
+  from{transform:scale(.04);opacity:0}
+  to  {transform:scale(1);  opacity:1}
+}
+@keyframes originMorphOut{
+  from{transform:scale(1);  opacity:1}
+  to  {transform:scale(.04);opacity:0}
+}
+.modal-box.origin-morph{transform:scale(.04);opacity:0}
+#msgModal.show   .modal-box.origin-morph{transform:scale(1);opacity:1;animation:originMorphIn  .44s cubic-bezier(.16,1,.3,1) both}
+#msgModal.closing .modal-box.origin-morph{transform:scale(.04);opacity:0;animation:originMorphOut .22s cubic-bezier(.4,0,1,1)  both}
+
+.modal-box:hover{box-shadow:0 2px 0 rgba(255,255,255,.05) inset, 0 36px 90px rgba(0,0,0,.8), 0 0 100px rgba(59,130,246,.08)}
+
+.modal-title{
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:-.2px;
+  margin-bottom:6px;
+  color:#eef2f8;
+}
+.modal-text{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.58;
+  margin-bottom:10px;
+}
+.modal-error{
+  display:none;
+  margin-top:10px;
+  padding:10px 13px;
+  border-radius:12px;
+  background:linear-gradient(135deg,rgba(220,38,38,.1),rgba(239,68,68,.07));
+  border:1px solid rgba(239,68,68,.22);
+  color:#fca5a5;
+  font-size:12.5px;
+  line-height:1.5;
+  animation:fadeInUp .22s ease;
+}
+.modal-error.show{display:block}
+.modal-fields{display:grid;gap:8px}
+.modal-actions{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+.modal-actions button{
+  flex:1 1 120px;
+  min-width:120px;
+  max-width:180px;
+  justify-content:center;
+  padding:0 12px;
+  height:42px;
+}
+#msgModal .modal-actions{
+  display:grid;width:100%;gap:9px;
+  justify-content:center;align-items:stretch;
+}
+#msgModal .modal-actions button{
+  width:100%;min-width:0;max-width:none;
+  padding:11px 14px;height:auto;min-height:42px;
+  white-space:normal;line-height:1.15;text-wrap:balance;
+}
+
+/* ── TOGGLE ROW ──────────────────────────────────────────────────────*/
+.toggle-row{
+  display:flex;align-items:center;gap:12px;
+  font-size:14px;font-weight:600;
+  user-select:none;cursor:pointer;
+  padding:8px 4px;
+  border-radius:10px;
+  transition:background .18s ease;
+}
+.toggle-row:hover{background:rgba(59,130,246,.05)}
+.toggle-row input{
+  width:18px;height:18px;
+  margin:0;padding:0;
+  border:none;background:none;
+  accent-color:#60a5fa;
+  transition:none;box-shadow:none;flex-shrink:0;
+}
+.toggle-row input:focus,.toggle-row input:focus-visible{
+  outline:2px solid rgba(99,179,237,.5);
+  outline-offset:3px;box-shadow:none;border-color:transparent;
+}
+
+/* ── TOOLBAR ─────────────────────────────────────────────────────────*/
+.toolbar{
+  display:flex;gap:10px;align-items:stretch;
+  margin:2px 0 12px;
+}
+.toolbar .action-btn{width:auto;min-width:170px}
+@media(max-width:520px){.toolbar .action-btn{width:100%}}
+
+/* ── ACTION BUTTON ───────────────────────────────────────────────────*/
+.action-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:9px;min-height:42px;width:100%;
+  padding:0 16px;border-radius:var(--radius-md);
+  cursor:pointer;font-size:13px;line-height:1;font-weight:600;
+  font-family:inherit;letter-spacing:.1px;
+  border:1px solid rgba(148,163,184,.14);
+  background:linear-gradient(160deg,rgba(12,20,40,.92) 0%,rgba(6,10,22,.96) 100%);
+  color:#d0dff0;
+  box-shadow:0 2px 8px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.045);
+  position:relative;overflow:hidden;
+  transition:transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s ease,
+             border-color .18s ease, background .18s ease, filter .18s ease;
+  will-change:transform;
+}
+.action-btn svg{width:15px;height:15px;flex:0 0 auto}
+.action-btn:hover{
+  transform:translateY(-2px);
+  border-color:rgba(99,179,237,.26);
+  box-shadow:0 6px 20px rgba(37,99,235,.16), 0 12px 28px rgba(0,0,0,.38);
+  filter:brightness(1.08);
+}
+/* Shimmer sweep */
+.action-btn::before{
+  content:"";
+  position:absolute;
+  inset:-60% -40%;
+  background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.11) 50%,transparent 65%);
+  transform:translateX(-35%);
+  transition:transform .55s ease;
+  pointer-events:none;
+}
+.action-btn:hover::before{transform:translateX(35%)}
+.action-btn:active{transform:translateY(0) scale(.977)}
+
+.action-btn.primary{
+  background:linear-gradient(135deg,#1d4ed8 0%,#3b82f6 55%,#60a5fa 100%);
+  border-color:rgba(147,197,253,.25);
+  color:#fff;
+  box-shadow:0 4px 18px rgba(37,99,235,.35), 0 2px 6px rgba(0,0,0,.3),
+             inset 0 1px 0 rgba(255,255,255,.18);
+  text-shadow:0 1px 3px rgba(0,0,0,.35);
+}
+.action-btn.primary:hover{
+  box-shadow:0 8px 28px rgba(37,99,235,.52), 0 4px 10px rgba(0,0,0,.35),
+             inset 0 1px 0 rgba(255,255,255,.2);
+}
+.action-btn.secondary{
+  background:linear-gradient(160deg,rgba(12,20,40,.92) 0%,rgba(6,10,22,.96) 100%);
+}
+
+/* ── DELETE STAGE ────────────────────────────────────────────────────*/
+#formModal.deleting .form-body{display:none}
+#formModal .delete-stage{
+  display:none;min-height:260px;
+  align-items:center;justify-content:center;flex-direction:column;text-align:center;
+}
+#formModal.deleting .delete-stage{display:flex}
+#formModal.deleting .modal-box{overflow:hidden}
+.modal-box.shrink{animation:modalShrink .18s ease forwards}
+.trash-scene{
+  position:relative;width:140px;height:140px;
+  display:flex;align-items:center;justify-content:center;
+}
+.trash-bin{
+  position:relative;width:64px;height:64px;
+  animation:binPop .85s ease forwards;
+}
+.trash-lid{
+  position:absolute;top:10px;left:10px;
+  width:44px;height:8px;border-radius:999px;
+  background:rgba(255,255,255,.88);
+  transform:rotate(-12deg);
+  box-shadow:0 6px 14px rgba(0,0,0,.18);
+}
+.trash-body{
+  position:absolute;top:18px;left:14px;
+  width:36px;height:42px;
+  border:2px solid rgba(255,255,255,.9);
+  border-top:none;border-radius:0 0 10px 10px;
+}
+.paper-sheet{
+  position:absolute;width:46px;height:54px;
+  border-radius:8px;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(219,234,254,.9));
+  box-shadow:0 10px 22px rgba(0,0,0,.25);
+  transform-origin:center;
+  animation:paperToBin .85s cubic-bezier(.22,.61,.36,1) forwards;
+}
+.paper-sheet::before,.paper-sheet::after{
+  content:"";position:absolute;left:8px;right:8px;
+  height:2px;background:rgba(59,130,246,.35);border-radius:2px;
+}
+.paper-sheet::before{top:14px}
+.paper-sheet::after{top:24px}
+
+/* ── TOASTS ──────────────────────────────────────────────────────────*/
+.toasts{
+  position:fixed;top:18px;right:18px;z-index:20000;
+  display:flex;flex-direction:column;gap:9px;pointer-events:none;
+}
+.toast{
+  min-width:280px;max-width:min(92vw,380px);
+  background:linear-gradient(160deg,rgba(10,17,36,.92) 0%,rgba(6,10,22,.95) 100%);
+  border:1px solid rgba(148,163,184,.16);
+  box-shadow:0 20px 50px rgba(0,0,0,.55), 0 4px 12px rgba(0,0,0,.35),
+             inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(20px) saturate(1.4);
+  -webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border-radius:16px;
+  padding:12px 16px 13px;
+  color:#e8edf5;
+  transform:translateX(20px) translateY(-12px) scale(.96);
+  opacity:0;
+  animation:toastIn .26s cubic-bezier(.2,.9,.2,1) forwards, toastOut .3s ease forwards 2.8s;
+}
+.toast-title{font-size:12.5px;font-weight:700;margin-bottom:3px;letter-spacing:.1px}
+.toast-message{font-size:12.5px;color:#8ba4c2;line-height:1.5}
+.toast.success{
+  border-color:rgba(16,185,129,.28);
+  box-shadow:0 20px 50px rgba(0,0,0,.55), 0 0 40px rgba(16,185,129,.08),
+             inset 0 1px 0 rgba(52,211,153,.1);
+}
+.toast.error{
+  border-color:rgba(239,68,68,.28);
+  box-shadow:0 20px 50px rgba(0,0,0,.55), 0 0 40px rgba(239,68,68,.08),
+             inset 0 1px 0 rgba(248,113,113,.1);
+}
+.toast.info{
+  border-color:rgba(99,179,237,.28);
+  box-shadow:0 20px 50px rgba(0,0,0,.55), 0 0 40px rgba(59,130,246,.08),
+             inset 0 1px 0 rgba(147,197,253,.1);
+}
+
+/* ── DATASET CARD & LOCK ─────────────────────────────────────────────*/
+.dataset-card{isolation:isolate;position:relative;overflow:hidden}
+.dataset-card-blur-zone{
+  position:relative;z-index:1;
+  transition:filter .28s ease, opacity .28s ease;
+}
+.dataset-card.secured .dataset-card-blur-zone{
+  filter:blur(8px);opacity:.28;pointer-events:none;user-select:none;
+}
+.dataset-card.secured{cursor:var(--lock-cursor)}
+.dataset-card-lock-overlay{
+  position:absolute;inset:0;z-index:5;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:16px;text-align:center;padding:24px;
+  opacity:0;pointer-events:none;
+  transition:opacity .28s ease;
+  cursor:var(--lock-cursor);
+}
+.dataset-card.secured .dataset-card-lock-overlay{opacity:1;pointer-events:auto}
+.dataset-lock-icon{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  background:linear-gradient(135deg,#f59e0b 0%,#ef4444 35%,#d946ef 65%,#3b82f6 100%);
+  box-shadow:0 12px 30px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.14),
+             0 0 40px rgba(239,68,68,.2);
+  color:#fff;
+}
+.dataset-lock-icon svg{width:28px;height:28px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
+.dataset-lock-text{
+  font-size:13px;font-weight:600;color:#c8d8ec;max-width:240px;line-height:1.58;
+}
+.dataset-select-wrap{position:relative;margin-top:4px}
+.dataset-select-wrap select{
+  appearance:none;-webkit-appearance:none;
+  padding-right:40px;font-weight:600;cursor:pointer;
+}
+.dataset-select-wrap::after{
+  content:"";position:absolute;right:14px;top:50%;
+  width:9px;height:9px;
+  border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+  transform:translateY(-65%) rotate(45deg);pointer-events:none;
+}
+.dataset-info{
+  margin-top:12px;padding:12px 14px;
+  border-radius:12px;
+  background:rgba(2,6,18,.55);
+  border:1px solid rgba(148,163,184,.1);
+  font-size:12px;color:var(--muted);line-height:1.75;
+}
+.dataset-info b{color:#a0bcd8;font-weight:600}
+.dataset-info .dataset-info-row{display:flex;justify-content:space-between;gap:10px}
+.dataset-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.dataset-actions .action-btn{flex:1 1 170px}
+@media(max-width:520px){.dataset-actions .action-btn{flex:1 1 100%}}
+
+/* Dataset pill */
+.dataset-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10.5px;font-weight:700;letter-spacing:.5px;
+  padding:5px 16px 5px 11px;
+  border-radius:0 999px 999px 0;
+  background:linear-gradient(90deg,rgba(37,99,235,.2) 0%,rgba(59,130,246,.07) 100%);
+  color:#93c5fd;
+  border-top:1px solid rgba(59,130,246,.22);
+  border-right:1px solid rgba(59,130,246,.22);
+  border-bottom:1px solid rgba(59,130,246,.22);
+  border-left:3px solid #3b82f6;
+  margin-left:-22px;
+  margin-bottom:20px;
+  white-space:nowrap;
+  max-width:calc(100% + 22px);
+  box-shadow:5px 0 18px rgba(37,99,235,.14),inset 0 1px 0 rgba(147,197,253,.08);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.dataset-pill svg{width:12px;height:12px;flex:0 0 auto;opacity:.8}
+
+.verify-result{
+  margin-top:10px;font-size:12px;line-height:1.65;
+  border-radius:12px;padding:10px 13px;display:none;white-space:pre-line;
+}
+.verify-result.show{display:block}
+.verify-result.ok{
+  background:linear-gradient(135deg,rgba(16,185,129,.09),rgba(5,150,105,.06));
+  border:1px solid rgba(16,185,129,.22);color:#6ee7b7;
+}
+.verify-result.warn{
+  background:linear-gradient(135deg,rgba(239,68,68,.09),rgba(220,38,38,.06));
+  border:1px solid rgba(239,68,68,.22);color:#fca5a5;
+}
+
+/* ── KEYFRAMES ───────────────────────────────────────────────────────*/
+@keyframes modalShrink{
+  from{transform:scale(1) translateY(0);opacity:1}
+  to  {transform:scale(.87) translateY(18px);opacity:0}
+}
+@keyframes fadeInUp{
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes toastIn{
+  to{opacity:1;transform:translateX(0) translateY(0) scale(1)}
+}
+@keyframes toastOut{
+  to{opacity:0;transform:translateX(22px) translateY(-10px) scale(.96)}
+}
+@keyframes shine{0%{left:-50%}100%{left:120%}}
+@keyframes iconOpen{
+  0%  {transform:scale(.82) rotate(-28deg);opacity:.6}
+  60% {transform:scale(1.14) rotate(9deg); opacity:1}
+  100%{transform:scale(1)   rotate(0deg); opacity:1}
+}
+@keyframes iconClose{
+  0%  {transform:scale(1.1)  rotate(0deg);opacity:1}
+  100%{transform:scale(1)   rotate(0deg);opacity:1}
+}
+@keyframes paperToBin{
+  0%  {transform:translate(-70px,-40px) rotate(-8deg) scale(1); opacity:1}
+  40% {transform:translate(-16px,-10px) rotate(6deg)  scale(.95)}
+  70% {transform:translate(6px,18px)   rotate(18deg) scale(.55)}
+  100%{transform:translate(10px,28px)  rotate(28deg) scale(.08);opacity:0}
+}
+@keyframes binPop{
+  0%  {transform:scale(.82) translateY(14px);opacity:0}
+  35% {opacity:1}
+  100%{transform:scale(1)   translateY(0);  opacity:1}
+}
+@keyframes progressShine{
+  0%  {transform:translateX(-100%)}
+  100%{transform:translateX(220%)}
+}
+@keyframes statPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(59,130,246,.0)}
+  50%    {box-shadow:0 0 0 8px rgba(59,130,246,.0)}
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────*/
+@media(max-width:920px){
+  .app-shell{width:calc(100% - 16px)}
+  .nav{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:720px){
+  .app-shell{width:calc(100% - 14px)}
+  .nav{gap:5px;padding:5px;border-radius:22px;top:10px}
+  .nav button{padding:12px 8px;font-size:13px;border-radius:17px}
+  .nav button svg{width:15px;height:15px}
+  .section{padding:16px}
+  .stage-shell{border-radius:26px}
+  .stage{border-radius:25px}
+  .settings-grid{grid-template-columns:1fr}
+  .dash-bottom-grid{grid-template-columns:1fr !important}
+  .dash-3-grid{grid-template-columns:1fr !important}
+}
+@media(max-width:520px){
+  .app-shell{width:calc(100% - 10px)}
+  .nav{grid-template-columns:1fr;padding:7px;gap:5px;border-radius:18px;top:8px}
+  .nav button{padding:10px 6px;font-size:12.5px;border-radius:13px}
+  .nav button svg{width:14px;height:14px}
+  .nav button.active::after{left:11px;right:11px;bottom:6px}
+  .section{padding:12px}
+  .stage-shell{margin-top:10px;border-radius:22px}
+  .stage{border-radius:21px}
+  .modal-box{width:100%}
+  .modal-actions{flex-direction:column;align-items:stretch}
+  .modal-actions button{max-width:none;width:100%}
+  .toast{min-width:unset}
+  .toolbar{gap:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+}
+
+/* ── dash card: hover glass + entry shine + nav icon colours ──────────────*/
+.dc{position:relative;overflow:hidden;isolation:isolate;cursor:default;
+  transition:transform .3s cubic-bezier(.2,.9,.2,1),box-shadow .3s ease;}
+.dc::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:12;
+  background:linear-gradient(112deg,transparent 30%,rgba(255,255,255,.09) 50%,transparent 70%);
+  transform:translateX(-130%) skewX(-18deg);transition:transform 0s;
+}
+.dc:hover{transform:translateY(-9px) scale(1.013);
+  box-shadow:0 28px 64px rgba(0,0,0,.7),0 0 50px rgba(59,130,246,.07);}
+.dc:hover::after{transform:translateX(200%) skewX(-18deg);transition:transform .55s ease;}
+.entry-shine{
+  position:absolute;inset:0;pointer-events:none;z-index:11;
+  background:linear-gradient(112deg,transparent 28%,rgba(255,255,255,.09) 50%,transparent 72%);
+  opacity:0;
+}
+@keyframes cardEntryShine{
+  0%{transform:translateX(-130%) skewX(-18deg);opacity:0}
+  12%{opacity:1}88%{opacity:1}
+  100%{transform:translateX(270%) skewX(-18deg);opacity:0}
+}
+.dash-3-grid.shine-active .dc:nth-child(1) .entry-shine{animation:cardEntryShine .65s cubic-bezier(.4,0,.2,1) .00s both}
+.dash-3-grid.shine-active .dc:nth-child(2) .entry-shine{animation:cardEntryShine .65s cubic-bezier(.4,0,.2,1) .13s both}
+.dash-3-grid.shine-active .dc:nth-child(3) .entry-shine{animation:cardEntryShine .65s cubic-bezier(.4,0,.2,1) .26s both}
+/* Nav active icon colours */
+.nav button[data-section="input"].active svg{stroke:#60a5fa;filter:drop-shadow(0 0 7px rgba(96,165,250,.6));}
+.nav button[data-section="dashboard"].active svg{stroke:#a78bfa;filter:drop-shadow(0 0 7px rgba(167,139,250,.6));}
+.nav button[data-section="settings"].active svg{stroke:#22d3ee;filter:drop-shadow(0 0 7px rgba(34,211,238,.6));}
+.nav button:hover:not(.active) svg{opacity:.9;transform:scale(1.1);}
+/* responsive 3-card grid */
+.dash-3-grid{display:grid;grid-template-columns:1fr 1.9fr 1.6fr;gap:14px;margin-top:20px;align-items:stretch;}
+@media(max-width:720px){.dash-3-grid{grid-template-columns:1fr!important;}}
+
+
+/* ── APP COPYRIGHT FOOTER ─────────────────────────────────────────────────*/
+.app-copyright{
+  text-align:center;
+  font-size:9.5px;
+  color:var(--muted2);
+  padding:5px 10px 1px;
+  letter-spacing:.4px;
+  font-weight:500;
+  flex-shrink:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  opacity:.75;
+}
+.app-copyright strong{color:#93c5fd;font-weight:700;}
+.app-copyright span{letter-spacing:.6px;}
+
+/* ── STAGE — give left wall space for bookmark ────────────────────────────*/
+.section{padding-left:38px;padding-right:38px;}
+
+/* ── DATASET ACTION BUTTONS — icon centred above text ────────────────────*/
+.da-btn{flex-direction:column;gap:5px;padding:14px 8px;min-height:60px;font-size:11px;line-height:1.3;}
+.da-btn svg{width:19px;height:19px;}
+.da-btn span{text-align:center;}
+@media(max-width:520px){.da-btn{flex:1 1 100%;flex-direction:row;min-height:44px;padding:0 12px;}}
+
+
+/* ── ADD INPUT FAB visibility + hover ─────────────────────────────────────*/
+#addBtn{opacity:0;pointer-events:none;}
+#addBtn.fab-visible{opacity:1;pointer-events:auto;}
+#addBtn:hover{transform:translateY(-50%) translateX(-3px);box-shadow:-9px 0 34px rgba(37,99,235,.4),inset 1px 0 0 rgba(191,219,254,.2);}
+#addBtn:active{transform:translateY(-50%) translateX(-1px) scale(.97);}
+#addBtn.fab-visible:disabled{cursor:var(--lock-cursor) !important;filter:saturate(.7) grayscale(.15);opacity:.55;}
+#addBtn.fab-visible:disabled:hover{cursor:var(--lock-cursor) !important;transform:translateY(-50%);box-shadow:-6px 0 28px rgba(37,99,235,.28),inset 1px 0 0 rgba(191,219,254,.14);}
+
+/* ── formModal origin-morph (mirrors msgModal) ────────────────────────────*/
+#formModal.show    .modal-box.origin-morph{transform:scale(1);opacity:1;animation:originMorphIn  .44s cubic-bezier(.16,1,.3,1) both}
+#formModal.closing .modal-box.origin-morph{transform:scale(.04);opacity:0;animation:originMorphOut .22s cubic-bezier(.4,0,1,1)  both}
+
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="nav" id="topNav" role="tablist" aria-label="Main navigation">
+    <button onclick="openSection('input')" data-section="input" role="tab" aria-controls="input">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M13 17h8M17 13v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Input</span>
+    </button>
+    <button onclick="openSection('dashboard')" data-section="dashboard" role="tab" aria-controls="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12a9 9 0 1 0 18 0A9 9 0 0 0 3 12z" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Dashboard</span>
+    </button>
+    <button onclick="openSection('settings')" data-section="settings" role="tab" aria-controls="settings">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2"/></svg>
+      <span>Settings</span>
+    </button>
+    <span class="nav-indicator" id="navIndicator" aria-hidden="true"></span>
+  </div>
+
+  <div class="toasts" id="toastContainer"></div>
+
+  <div class="stage-shell">
+    <div class="stage" id="appStage">
+
+<div id="input" class="section" aria-hidden="true">
+  <div class="dataset-pill" id="inputDatasetPill" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>
+    <span id="inputDatasetLabel">Loading…</span>
+  </div>
+  <div id="inputList" class="list-grid"></div>
+</div>
+
+<div id="dashboard" class="section active" aria-hidden="false">
+  <div id="dashboardContent"></div>
+</div>
+
+<div id="settings" class="section" aria-hidden="true">
+  <div class="settings-grid">
+    <div class="card" style="position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-50px;right:-50px;width:180px;height:180px;
+        background:radial-gradient(circle,rgba(139,92,246,.09),transparent 65%);pointer-events:none;"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="width:38px;height:38px;border-radius:12px;flex-shrink:0;
+          background:linear-gradient(135deg,rgba(109,40,217,.25),rgba(139,92,246,.15));
+          border:1px solid rgba(139,92,246,.22);
+          display:flex;align-items:center;justify-content:center;
+          box-shadow:0 4px 14px rgba(109,40,217,.2),inset 0 1px 0 rgba(196,181,253,.1);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2.2" stroke="#a78bfa" stroke-width="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15.5" r="1.4" fill="#a78bfa"/></svg>
+        </div>
+        <div>
+          <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.1px;">Security</h3>
+          <div style="font-size:11px;color:var(--muted2);font-weight:600;letter-spacing:.3px;text-transform:uppercase;margin-top:1px;">Access Control</div>
+        </div>
+      </div>
+      <div class="setting-note">Protect the input section with a password so only you can add, edit, or delete records.</div>
+      <div class="setting-divider"></div>
+      <label class="toggle-row">
+        <input type="checkbox" id="lockToggle">
+        <span style="font-size:14px;font-weight:600;">Secure Input Section</span>
+      </label>
+    </div>
+
+    <div class="card dataset-card" id="datasetCard">
+      <div class="dataset-card-blur-zone" id="datasetBlurZone">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <div style="width:38px;height:38px;border-radius:12px;flex-shrink:0;
+            background:linear-gradient(135deg,rgba(37,99,235,.25),rgba(59,130,246,.15));
+            border:1px solid rgba(59,130,246,.22);
+            display:flex;align-items:center;justify-content:center;
+            box-shadow:0 4px 14px rgba(37,99,235,.2),inset 0 1px 0 rgba(147,197,253,.1);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="#60a5fa" stroke-width="2" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.1px;">Active Dataset</h3>
+            <div style="font-size:11px;color:var(--muted2);font-weight:600;letter-spacing:.3px;text-transform:uppercase;margin-top:1px;">Data Source</div>
+          </div>
+        </div>
+        <div class="setting-note">Switch between the trackers configured in <code>dataset.js</code> — the separate file next to index.html. Each one loads its own records and evidence photos instantly, with no import/export needed and no risk to the app itself.</div>
+        <div class="setting-divider"></div>
+
+        <div class="dataset-select-wrap">
+          <select id="datasetSelect"></select>
+        </div>
+
+        <div class="dataset-info" id="datasetInfo"></div>
+
+        <div class="dataset-actions">
+          <button class="action-btn secondary da-btn" id="verifyImagesBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 12.5l2.2 2.2L16 9.5" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="#34d399" stroke-width="2.1"/></svg>
+            <span>Verify Evidence Images</span>
+          </button>
+          <button class="action-btn secondary da-btn" id="downloadDatasetBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" stroke="#60a5fa" stroke-width="2.1" stroke-linecap="round"/></svg>
+            <span>Download Current Dataset</span>
+          </button>
+          <button class="action-btn secondary da-btn" id="downloadFullDataBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.4" stroke="#a78bfa" stroke-width="2.1"/><rect x="13" y="4" width="7" height="7" rx="1.4" stroke="#a78bfa" stroke-width="2.1"/><rect x="4" y="13" width="7" height="7" rx="1.4" stroke="#a78bfa" stroke-width="2.1"/><path d="M16.5 13v7m0 0 2.7-2.7M16.5 20l-2.7-2.7" stroke="#a78bfa" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Download Full App Data</span>
+          </button>
+        </div>
+
+        <div class="verify-result" id="verifyResult"></div>
+      </div>
+
+      <div class="dataset-card-lock-overlay" id="datasetLockOverlay">
+        <div class="dataset-lock-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2.2" stroke="currentColor" stroke-width="2.1"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="15.5" r="1.4" fill="currentColor"/></svg>
+        </div>
+        <div class="dataset-lock-text">Uncheck the Secure Input Section to access this card</div>
+      </div>
+    </div>
+  </div>
+    </div>
+
+      <!-- ══ VERTICAL DATASET BOOKMARK — always visible on left wall ══ -->
+      <div id="stageBookmark" style="
+          position:absolute;left:0;top:50%;transform:translateY(-50%);
+          z-index:50;display:flex;flex-direction:column;align-items:center;
+          gap:8px;padding:16px 7px;
+          background:linear-gradient(180deg,rgba(9,15,34,.94),rgba(5,9,22,.9));
+          border-top:1px solid rgba(59,130,246,.24);
+          border-right:1px solid rgba(59,130,246,.24);
+          border-bottom:1px solid rgba(59,130,246,.24);
+          border-radius:0 14px 14px 0;
+          box-shadow:6px 0 28px rgba(37,99,235,.16),inset -1px 0 0 rgba(147,197,253,.06);
+          backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+          cursor:default;max-height:220px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+          <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+            stroke="#60a5fa" stroke-width="2.2" stroke-linejoin="round"/>
+        </svg>
+        <div id="bookmarkText" style="
+            writing-mode:vertical-rl;transform:rotate(180deg);
+            font-size:9.5px;font-weight:700;color:#93c5fd;
+            letter-spacing:.7px;text-transform:uppercase;
+            max-height:160px;overflow:hidden;white-space:nowrap;
+            text-overflow:ellipsis;">Dataset</div>
+      </div>
+
+      <!-- ══ ADD INPUT FAB — mirrors bookmark, right wall, Input tab only ══ -->
+      <button id="addBtn" onclick="openForm()" style="
+          position:absolute;right:0;top:50%;transform:translateY(-50%);
+          z-index:50;display:flex;flex-direction:column;align-items:center;
+          gap:9px;padding:16px 7px;border:none;cursor:pointer;
+          background:linear-gradient(180deg,rgba(29,78,216,.94),rgba(15,45,140,.9));
+          border-top:1px solid rgba(147,197,253,.4);
+          border-left:1px solid rgba(147,197,253,.4);
+          border-bottom:1px solid rgba(147,197,253,.4);
+          border-radius:14px 0 0 14px;
+          box-shadow:-6px 0 28px rgba(37,99,235,.28),inset 1px 0 0 rgba(191,219,254,.14);
+          backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+          max-height:220px;
+          transition:opacity .3s ease,transform .22s cubic-bezier(.2,.9,.2,1),box-shadow .22s ease;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+        </svg>
+        <span style="
+            writing-mode:vertical-rl;transform:rotate(180deg);
+            font-size:10px;font-weight:800;color:#fff;
+            letter-spacing:.8px;text-transform:uppercase;
+            text-shadow:0 1px 3px rgba(0,0,0,.3);">Add Input</span>
+      </button>
+
+    </div><!-- /.stage -->
+  </div><!-- /.stage-shell -->
+
+  <!-- ══ COPYRIGHT FOOTER — always visible below stage ══ -->
+  <div class="app-copyright">
+    Conceived &middot; Developed &middot; Designed by&nbsp;<strong>Chandrakanta&nbsp;(Lucky)</strong>&nbsp;&middot;&nbsp;<span id="appVersionText">Version&nbsp;03072026_1.0</span>
+  </div>
+
+</div><!-- /.app-shell -->
+
+<div id="formModal">
+  <div class="modal-box">
+    <div class="delete-stage">
+      <div class="trash-scene">
+        <div class="paper-sheet"></div>
+        <div class="trash-bin">
+          <div class="trash-lid"></div>
+          <div class="trash-body"></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;font-size:13px;color:#bfdbfe;font-weight:600;letter-spacing:.2px;">Deleting record…</div>
+    </div>
+
+    <div class="form-body">
+      <div class="modal-title" id="formTitle" style="font-size:19px;margin-bottom:10px;">Add Input</div>
+      <div id="formError" class="modal-error" style="margin-bottom:10px;"></div>
+
+      <div style="display:grid;gap:10px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted2);margin-bottom:4px;">Date &amp; Time</div>
+          <input type="datetime-local" id="date" style="margin:0;">
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted2);margin-bottom:4px;">Type</div>
+          <select id="type" style="margin:0;">
+            <option value="taken">Taken</option>
+            <option value="returned">Returned</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted2);margin-bottom:4px;">Amount (₹)</div>
+          <input type="number" id="amount" placeholder="e.g. 500" min="0" step="any" style="margin:0;">
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted2);margin-bottom:4px;">Description</div>
+          <textarea id="desc" placeholder="What was this transaction for?" style="margin:0;resize:vertical;min-height:76px;"></textarea>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted2);margin-bottom:4px;">Evidence Photo</div>
+          <input type="file" id="proof" accept="image/*" style="margin:0;">
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:18px;">
+        <button class="primary" id="saveBtn" onclick="saveInput(false)">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4h11l3 3v13H5z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M8 4v6h8V4" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M8 20v-6h8v6" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>
+          <span>Save</span>
+        </button>
+        <button class="secondary" id="saveMoreBtn" onclick="saveInput(true)">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          <span>Save &amp; Add More</span>
+        </button>
+      </div>
+      <div class="modal-actions" style="margin-top:10px;">
+        <button class="danger" id="deleteBtn" style="display:none;" onclick="askDeleteCurrent()">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>Delete</span>
+        </button>
+        <button class="secondary" id="closeFormBtn" onclick="closeForm()">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+          <span>Close</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="imgModal" onclick="closeImageModal()"></div>
+
+<div id="msgModal">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-title" id="msgTitle">Message</div>
+    <div class="modal-text" id="msgText"></div>
+    <div id="msgError" class="modal-error"></div>
+    <div class="modal-fields">
+      <input id="msgInput1" type="text" style="display:none;">
+      <input id="msgInput2" type="text" style="display:none;">
+    </div>
+    <div class="modal-actions">
+      <button id="msgCancelBtn" class="secondary" style="display:none;"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg><span>Cancel</span></button>
+      <button id="msgAltBtn" class="secondary" style="display:none;"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2.2-3 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M12 17.5h.01" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg><span>Forgot Password</span></button>
+      <button id="msgOkBtn" class="primary"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>OK</span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   BOOT ERROR SAFETY NET
+   ---------------------------------------------------------------------
+   dataset.js is meant to be hand-edited. If a stray comma, bracket, or
+   quote breaks it, the browser would otherwise just show a blank/black
+   screen with no clue why. This catches that failure and shows exactly
+   what went wrong (and where) instead of leaving a black screen.
+   ═══════════════════════════════════════════════════════════════════ */
+(function () {
+  window.__datasetError = null;
+  window.addEventListener('error', function (e) {
+    if (window.__appBooted) return;
+    if (e && e.filename && /dataset\.js/.test(e.filename)) {
+      window.__datasetError = {
+        message: e.message || 'Unknown error',
+        line: e.lineno || null,
+        col: e.colno || null
+      };
+    }
+  });
+
+  window.__showBootError = function (fallbackMessage) {
+    var err = window.__datasetError;
+    var detail = err
+      ? (err.message + (err.line ? ' — dataset.js, line ' + err.line + (err.col ? ', column ' + err.col : '') : ' — dataset.js'))
+      : (fallbackMessage || 'dataset.js did not define the data the app needs (DATASETS, DEFAULT_DATASET_ID, or DEFAULT_APP_STATE).');
+
+    var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+
+    document.title = 'Tracker App — Configuration Error';
+    document.documentElement.innerHTML =
+      '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+      '<style>' +
+      'html,body{margin:0;min-height:100%;background:radial-gradient(ellipse 120% 80% at 20% 0%,#0c1a38 0%,transparent 55%),radial-gradient(ellipse 80% 60% at 80% 100%,#080e22 0%,transparent 50%),#010409;' +
+      'font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#e8edf5;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;}' +
+      '*{box-sizing:border-box}' +
+      '.err-card{max-width:580px;width:100%;background:linear-gradient(160deg,rgba(8,14,32,.97),rgba(10,17,36,.95));' +
+      'border:1px solid rgba(239,68,68,.3);border-radius:22px;padding:34px 32px;box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 60px rgba(239,68,68,.08);}' +
+      '.err-icon{width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,rgba(220,38,38,.22),rgba(239,68,68,.12));' +
+      'border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;margin-bottom:18px;}' +
+      '.err-title{font-size:19px;font-weight:800;margin-bottom:8px;letter-spacing:-.2px;}' +
+      '.err-sub{font-size:13px;color:#94a3b8;line-height:1.7;margin-bottom:18px;}' +
+      '.err-sub code{background:rgba(59,130,246,.12);color:#93c5fd;padding:1px 6px;border-radius:5px;font-size:12px;}' +
+      '.err-detail{background:rgba(2,6,18,.6);border:1px solid rgba(239,68,68,.22);border-radius:12px;' +
+      'padding:12px 14px;font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12.5px;color:#fca5a5;' +
+      'line-height:1.6;margin-bottom:22px;word-break:break-word;white-space:pre-wrap;}' +
+      '.err-label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#64748b;margin-bottom:8px;}' +
+      '.err-list{font-size:12.5px;color:#94a3b8;line-height:1.9;margin:0 0 24px;padding-left:18px;}' +
+      '.err-list code{background:rgba(148,163,184,.1);color:#cbd5e1;padding:1px 5px;border-radius:4px;font-size:11.5px;}' +
+      '.err-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);' +
+      'color:#fff;border:none;padding:11px 22px;border-radius:12px;font-weight:700;font-size:13.5px;cursor:pointer;' +
+      'box-shadow:0 4px 18px rgba(37,99,235,.35);}' +
+      '</style></head>' +
+      '<body><div class="err-card">' +
+      '<div class="err-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+      '<div class="err-title">dataset.js has a problem</div>' +
+      '<div class="err-sub">The app could not start because <code>dataset.js</code> failed to load correctly. Nothing else is broken — <code>index.html</code> itself is fine.</div>' +
+      '<div class="err-label">What the browser reported</div>' +
+      '<div class="err-detail">' + esc(detail) + '</div>' +
+      '<div class="err-label">Common causes</div>' +
+      '<ul class="err-list">' +
+      '<li>A missing or extra comma, curly brace <code>{ }</code>, or parenthesis <code>( )</code></li>' +
+      '<li>A quote left unclosed — an apostrophe inside a description or name that was not escaped as <code>\\\'</code></li>' +
+      '<li>Pasting a dataset object without its surrounding <code>{ }</code></li>' +
+      '<li>Editing outside of the <code>DATASETS</code>, <code>DEFAULT_APP_STATE</code>, or <code>APP_VERSION</code> blocks</li>' +
+      '</ul>' +
+      '<button class="err-btn" onclick="location.reload()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 13.66-5.66M20 12a8 8 0 0 1-13.66 5.66" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M18 3v4.5h-4.5M6 21v-4.5h4.5" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>Reload after fixing dataset.js</button>' +
+      '</div></body>';
+  };
+})();
+</script>
+<script src="dataset.js"></script>
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+  if (typeof DATASETS === 'undefined' || !Array.isArray(DATASETS) || !DATASETS.length ||
+      typeof DEFAULT_DATASET_ID === 'undefined' || typeof DEFAULT_APP_STATE === 'undefined') {
+    window.__showBootError();
+    return;
+  }
+  let activeDataset = DATASETS.find(ds => ds.id === DEFAULT_DATASET_ID) || DATASETS[0];
+
+  function workingDataKey(id) { return 'data::' + id; }
+
+  function cloneItems(items) {
+    return (items || []).map(it => Object.assign({}, it));
+  }
+
+  function loadWorkingData(ds) {
+    try {
+      const raw = localStorage.getItem(workingDataKey(ds.id));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) { /* fall through to seed data */ }
+    return cloneItems(ds.items);
+  }
+
+  function saveWorkingData(ds, records) {
+    localStorage.setItem(workingDataKey(ds.id), JSON.stringify(records));
+  }
+
+  let data = loadWorkingData(activeDataset);
+  let locked = localStorage.getItem('locked') !== null ? localStorage.getItem('locked') === 'true' : DEFAULT_APP_STATE.locked;
+  let password = localStorage.getItem('password') !== null ? localStorage.getItem('password') : DEFAULT_APP_STATE.password;
+  let passwordHint = localStorage.getItem('passwordHint') !== null ? localStorage.getItem('passwordHint') : DEFAULT_APP_STATE.passwordHint;
+  let editIndex = null;
+  let existingProof = null;
+  let existingProofName = '';
+  let existingProofData = '';
+  let securityBusy = false;
+  let deleteInProgress = false;
+
+  let popupConfirmHandler = null;
+  let popupCancelHandler = null;
+  let popupAltHandler = null;
+
+  const lockEl = document.getElementById('lockToggle');
+  const addBtn = document.getElementById('addBtn');
+
+  const datasetCard = document.getElementById('datasetCard');
+  const datasetBlurZone = document.getElementById('datasetBlurZone');
+  const datasetSelect = document.getElementById('datasetSelect');
+  const datasetInfo = document.getElementById('datasetInfo');
+  const verifyImagesBtn = document.getElementById('verifyImagesBtn');
+  const downloadDatasetBtn = document.getElementById('downloadDatasetBtn');
+  const downloadFullDataBtn = document.getElementById('downloadFullDataBtn');
+  const verifyResult = document.getElementById('verifyResult');
+  const inputDatasetLabel = document.getElementById('inputDatasetLabel');
+
+  const formTitle = document.getElementById('formTitle');
+  const saveBtn = document.getElementById('saveBtn');
+  const saveMoreBtn = document.getElementById('saveMoreBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+
+  const formModal = document.getElementById('formModal');
+  const popup = document.getElementById('msgModal');
+  const msgTitle = document.getElementById('msgTitle');
+  const msgText = document.getElementById('msgText');
+  const msgError = document.getElementById('msgError');
+  const msgInput1 = document.getElementById('msgInput1');
+  const msgInput2 = document.getElementById('msgInput2');
+  const msgOkBtn = document.getElementById('msgOkBtn');
+  const msgCancelBtn = document.getElementById('msgCancelBtn');
+  const msgAltBtn = document.getElementById('msgAltBtn');
+  const msgActions = msgOkBtn.closest('.modal-actions');
+  const toastContainer = document.getElementById('toastContainer');
+  const topNav = document.getElementById('topNav');
+  const navIndicator = document.getElementById('navIndicator');
+  const appStage = document.getElementById('appStage');
+
+  let currentSectionId = 'dashboard';
+  let layoutRaf = null;
+  let scrollRaf = null;
+
+  function iconSvg(name) {
+    const icons = {
+      input: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+      dashboard: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`,
+      settings: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.07.07a2.2 2.2 0 0 1-3.11 3.11l-.07-.07a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.09 1.65V22a2.2 2.2 0 0 1-4.4 0v-.1a1.8 1.8 0 0 0-1.09-1.65 1.8 1.8 0 0 0-1.98.36l-.07.07a2.2 2.2 0 0 1-3.11-3.11l.07-.07A1.8 1.8 0 0 0 4.6 15a1.8 1.8 0 0 0-1.65-1.09H2.9a2.2 2.2 0 0 1 0-4.4h.1A1.8 1.8 0 0 0 4.6 8.42a1.8 1.8 0 0 0-.36-1.98l-.07-.07A2.2 2.2 0 1 1 7.28 3.26l.07.07a1.8 1.8 0 0 0 1.98.36A1.8 1.8 0 0 0 10.42 2.1V2a2.2 2.2 0 0 1 4.4 0v.1a1.8 1.8 0 0 0 1.09 1.65 1.8 1.8 0 0 0 1.98-.36l.07-.07a2.2 2.2 0 1 1 3.11 3.11l-.07.07A1.8 1.8 0 0 0 19.4 9.6a1.8 1.8 0 0 0 1.65 1.09H22a2.2 2.2 0 0 1 0 4.4h-.95A1.8 1.8 0 0 0 19.4 15Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/></svg>`,
+      plus: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+      export: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21V9m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+      import: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+      edit: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M14.7 4.3a1 1 0 0 1 1.4 0l3.6 3.6a1 1 0 0 1 0 1.4L9.2 20H5v-4.2L14.7 4.3Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>`,
+      save: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4h11l3 3v13H5z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M8 4v6h8V4" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M8 20v-6h8v6" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>`,
+      saveMore: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M5 4h10l4 4v12H5z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>`,
+      folder: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>`,
+      close: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>`,
+      ok: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      cancel: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>`,
+      help: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2.2-3 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M12 17.5h.01" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>`,
+      trash: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
+    };
+    return icons[name] || '';
+  }
+
+  function setButtonContent(el, icon, label) {
+    if (!el) return;
+    el.innerHTML = `${iconSvg(icon)}<span>${label}</span>`;
+  }
+
+  function setNavIcons() {
+    // Icons are now inline SVG in the HTML — no JS injection needed.
+  }
+
+  function syncPopupActionLayout(visibleCount) {
+    if (!msgActions) return;
+    const count = Math.max(1, Math.min(3, visibleCount || 1));
+    msgActions.style.gridTemplateColumns = `repeat(${count}, minmax(0, 1fr))`;
+    msgActions.style.maxWidth = count === 1 ? '180px' : (count === 2 ? '360px' : '540px');
+    msgActions.style.marginInline = 'auto';
+    msgActions.style.width = '100%';
+  }
+
+  function syncNavActive(activeId) {
+    document.querySelectorAll('.nav button[data-section]').forEach(btn => {
+      const isActive = btn.dataset.section === activeId;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      btn.setAttribute('tabindex', isActive ? '0' : '-1');
+    });
+    updateNavIndicator(activeId);
+    if (addBtn) addBtn.classList.toggle('fab-visible', activeId === 'input');
+  }
+
+  function updateNavIndicator(activeId) {
+    if (!topNav || !navIndicator) return;
+    const activeBtn = topNav.querySelector(`button[data-section="${activeId}"]`);
+    if (!activeBtn) return;
+    const navRect = topNav.getBoundingClientRect();
+    const btnRect = activeBtn.getBoundingClientRect();
+    navIndicator.style.opacity = '1';
+    navIndicator.style.width = `${btnRect.width}px`;
+    navIndicator.style.height = `${btnRect.height}px`;
+    navIndicator.style.transform = `translate3d(${btnRect.left - navRect.left}px, ${btnRect.top - navRect.top}px, 0)`;
+  }
+
+  function updateStageHeight() {
+    if (!appStage) return;
+    appStage.style.height = '100%';
+    appStage.style.minHeight = '0';
+  }
+
+  function scheduleLayoutUpdate(activeId = currentSectionId) {
+    if (layoutRaf) cancelAnimationFrame(layoutRaf);
+    layoutRaf = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        updateStageHeight();
+        updateNavIndicator(activeId);
+        layoutRaf = null;
+      });
+    });
+  }
+
+  function getActiveScroller() {
+    return document.querySelector('.section.active') || appStage;
+  }
+
+  function smoothScrollToTop(target = getActiveScroller()) {
+    if (scrollRaf) cancelAnimationFrame(scrollRaf);
+
+    const scroller = target && typeof target.scrollTop === 'number' ? target : null;
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!scroller) {
+      if (reduceMotion) {
+        window.scrollTo(0, 0);
+        return;
+      }
+
+      const startY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      if (startY <= 1) {
+        window.scrollTo(0, 0);
+        return;
+      }
+
+      const duration = Math.min(420, Math.max(240, Math.round(startY * 0.18)));
+      const startTime = performance.now();
+      const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+      const step = now => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = easeOutCubic(progress);
+        const nextY = Math.round(startY * (1 - eased));
+        window.scrollTo(0, nextY);
+
+        if (progress < 1) {
+          scrollRaf = requestAnimationFrame(step);
+        } else {
+          scrollRaf = null;
+          window.scrollTo(0, 0);
+        }
+      };
+
+      scrollRaf = requestAnimationFrame(step);
+      return;
+    }
+
+    const startY = scroller.scrollTop || 0;
+    if (reduceMotion || startY <= 1) {
+      scroller.scrollTop = 0;
+      return;
+    }
+
+    const duration = Math.min(420, Math.max(240, Math.round(startY * 0.18)));
+    const startTime = performance.now();
+    const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+    const step = now => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = easeOutCubic(progress);
+      scroller.scrollTop = Math.round(startY * (1 - eased));
+      if (progress < 1) {
+        scrollRaf = requestAnimationFrame(step);
+      } else {
+        scrollRaf = null;
+        scroller.scrollTop = 0;
+      }
+    };
+
+    scrollRaf = requestAnimationFrame(step);
+  }
+
+  lockEl.checked = locked;
+
+  setButtonContent(saveBtn, 'save', 'Save');
+  setButtonContent(saveMoreBtn, 'saveMore', 'Save & Add More');
+  setButtonContent(document.getElementById('closeFormBtn'), 'close', 'Close');
+  setButtonContent(document.getElementById('deleteBtn'), 'trash', 'Delete');
+  setButtonContent(msgOkBtn, 'ok', 'OK');
+  setButtonContent(msgCancelBtn, 'cancel', 'Cancel');
+  setButtonContent(msgAltBtn, 'help', 'Forgot Password');
+
+  function showToast(title, message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    `;
+    toastContainer.appendChild(toast);
+    setTimeout(() => toast.remove(), 3300);
+  }
+
+  function showMessage(title, message, type = 'info') {
+    showToast(title, message, type);
+  }
+
+  function showPopupError(message) {
+    msgError.textContent = message;
+    msgError.classList.add('show');
+  }
+
+  function clearPopupError() {
+    msgError.textContent = '';
+    msgError.classList.remove('show');
+  }
+
+  function animateModalClose(modalEl, callback, delay = 280) {
+    if (!modalEl) {
+      if (typeof callback === 'function') callback();
+      return;
+    }
+    modalEl.classList.remove('show');
+    modalEl.classList.add('closing');
+    setTimeout(() => {
+      modalEl.classList.remove('closing');
+      modalEl.style.visibility = 'hidden';
+      modalEl.style.pointerEvents = 'none';
+      if (typeof callback === 'function') callback();
+    }, delay);
+  }
+
+  function applyModalOriginMorph(modalEl, originEl) {
+    const box = modalEl.querySelector('.modal-box');
+    if (!box) return;
+
+    if (!originEl) {
+      box.classList.remove('origin-morph');
+      box.style.transformOrigin = '';
+      return;
+    }
+
+    // Add the morph class first so CSS scale(0.04) is applied, but measure
+    // using offsetWidth/offsetHeight which always return the *unscaled* layout
+    // dimensions (CSS transforms don't affect them).  The modal overlay is
+    // display:flex; align-items:center; justify-content:center, so the box is
+    // always viewport-centered — we can compute its unscaled top-left from
+    // the viewport dimensions directly, no getBoundingClientRect on the box.
+    box.classList.add('origin-morph');
+
+    const boxW = box.offsetWidth;
+    const boxH = box.offsetHeight;
+    const boxLeft = (window.innerWidth  - boxW) / 2;
+    const boxTop  = (window.innerHeight - boxH) / 2;
+
+    const originRect = originEl.getBoundingClientRect();
+    const originX = originRect.left + originRect.width  / 2;
+    const originY = originRect.top  + originRect.height / 2;
+
+    const clampedX = Math.min(Math.max(originX - boxLeft, 0), boxW);
+    const clampedY = Math.min(Math.max(originY - boxTop,  0), boxH);
+
+    box.style.transformOrigin = clampedX + 'px ' + clampedY + 'px';
+  }
+
+  function animateModalOpen(modalEl, originEl) {
+    if (!modalEl) return;
+    applyModalOriginMorph(modalEl, originEl);
+    modalEl.classList.remove('closing', 'show');
+    modalEl.style.display = 'flex';
+    modalEl.style.visibility = 'visible';
+    modalEl.style.pointerEvents = 'auto';
+    void modalEl.offsetWidth;
+    requestAnimationFrame(() => {
+      modalEl.classList.add('show');
+    });
+  }
+
+  function openPopup(options) {
+    const {
+      title = 'Message',
+      message = '',
+      fields = [],
+      confirmText = 'OK',
+      showCancel = false,
+      cancelText = 'Cancel',
+      altText = '',
+      onConfirm = null,
+      onCancel = null,
+      onAlt = null,
+      originEl = null
+    } = options || {};
+
+    const box = popup.querySelector('.modal-box');
+    if (box) {
+      box.classList.remove('shrink');
+    }
+    animateModalOpen(popup, originEl);
+
+    msgTitle.textContent = title;
+    msgText.textContent = message;
+    clearPopupError();
+
+    const inputs = [msgInput1, msgInput2];
+    inputs.forEach((input, index) => {
+      const field = fields[index];
+      if (field) {
+        input.style.display = 'block';
+        input.type = field.type || 'text';
+        input.placeholder = field.placeholder || '';
+        input.value = field.value || '';
+      } else {
+        input.style.display = 'none';
+        input.value = '';
+      }
+    });
+
+    setButtonContent(msgOkBtn, 'ok', confirmText);
+    setButtonContent(msgCancelBtn, 'cancel', cancelText);
+    msgCancelBtn.style.display = showCancel ? 'inline-flex' : 'none';
+    setButtonContent(msgAltBtn, 'help', altText || 'Forgot Password');
+    msgAltBtn.style.display = altText ? 'inline-flex' : 'none';
+
+    const visibleCount = 1 + (showCancel ? 1 : 0) + (altText ? 1 : 0);
+    syncPopupActionLayout(visibleCount);
+
+    popupConfirmHandler = onConfirm;
+    popupCancelHandler = onCancel;
+    popupAltHandler = onAlt;
+
+    setTimeout(() => {
+      const firstVisible = inputs.find(el => el.style.display === 'block');
+      if (firstVisible) firstVisible.focus();
+      else msgOkBtn.focus();
+    }, 0);
+  }
+
+  function closePopup(done) {
+    const box = popup.querySelector('.modal-box');
+    if (box) box.classList.remove('shrink');
+
+    // Release the security gate immediately so the next click is responsive,
+    // while the closing animation still plays on top of the page.
+    securityBusy = false;
+
+    animateModalClose(popup, function () {
+      popup.style.display = 'none';
+      popupConfirmHandler = null;
+      popupCancelHandler = null;
+      popupAltHandler = null;
+      msgInput1.value = '';
+      msgInput2.value = '';
+      clearPopupError();
+      securityBusy = false;
+      if (typeof done === 'function') done();
+    }, 260);
+  }
+
+  function closePopupAnimated(done) {
+    closePopup(done);
+  }
+
+  function transitionPopupAndThen(nextFn) {
+    closePopup(function () {
+      if (typeof nextFn === 'function') nextFn();
+    });
+  }
+
+  function syncControls() {
+    addBtn.disabled = locked;
+    datasetCard.classList.toggle('secured', locked);
+    datasetBlurZone.toggleAttribute('inert', locked);
+  }
+
+  function setLockedState(value) {
+    locked = value;
+    localStorage.setItem('locked', value ? 'true' : 'false');
+    lockEl.checked = value;
+    syncControls();
+    render();
+  }
+
+  function showLockMessage(message) {
+    showMessage('Access Restricted', message, 'error');
+  }
+
+  function sanitizeFolderName(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    const parts = raw.split(/[\\/]+/).filter(Boolean);
+    let folder = parts.length ? parts[parts.length - 1] : '';
+    folder = folder.replace(/[<>:"|?*\x00-\x1F]/g, '').trim();
+    return folder;
+  }
+
+  function sanitizeFileName(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    const parts = raw.split(/[\\/]+/).filter(Boolean);
+    let file = parts.length ? parts[parts.length - 1] : '';
+    file = file.replace(/[<>:"|?*\x00-\x1F]/g, '').trim();
+    return file;
+  }
+
+  function normalizeDateInputValue(value) {
+    if (!value) return '';
+
+    if (value instanceof Date && !isNaN(value.getTime())) {
+      return toDatetimeLocalValue(value);
+    }
+
+    const s = String(value).trim();
+    if (!s) return '';
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(s)) return s;
+
+    const monthNameMatch = s.match(/^(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]+)\s+(\d{4})\s+(\d{1,2}):(\d{2})(?:\:(\d{2}))?(?:\s*([ap]m))?$/i);
+    if (monthNameMatch) {
+      const day = Number(monthNameMatch[1]);
+      const monthName = monthNameMatch[2].toLowerCase();
+      const year = Number(monthNameMatch[3]);
+      let hour = Number(monthNameMatch[4]);
+      const minute = Number(monthNameMatch[5]);
+      const second = Number(monthNameMatch[6] || 0);
+      const ampm = (monthNameMatch[7] || '').toLowerCase();
+      return buildDateFromParts(year, monthName, day, hour, minute, second, ampm);
+    }
+
+    const dmyMatch = s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})(?:\s+(\d{1,2}):(\d{2})(?:\:(\d{2}))?(?:\s*([ap]m))?)?$/i);
+    if (dmyMatch) {
+      const day = Number(dmyMatch[1]);
+      const monthIndex = Number(dmyMatch[2]) - 1;
+      const year = Number(dmyMatch[3]);
+      let hour = Number(dmyMatch[4] || 0);
+      const minute = Number(dmyMatch[5] || 0);
+      const second = Number(dmyMatch[6] || 0);
+      const ampm = (dmyMatch[7] || '').toLowerCase();
+      if (monthIndex >= 0 && monthIndex <= 11) {
+        if (ampm === 'am' && hour === 12) hour = 0;
+        if (ampm === 'pm' && hour < 12) hour += 12;
+        const d = new Date(year, monthIndex, day, hour, minute, second, 0);
+        if (!isNaN(d.getTime())) return toDatetimeLocalValue(d);
+      }
+    }
+
+    const direct = new Date(s);
+    if (!isNaN(direct.getTime())) return toDatetimeLocalValue(direct);
+
+    return '';
+  }
+
+  function buildDateFromParts(year, monthName, day, hour, minute, second, ampm) {
+    const months = {
+      january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+      july: 6, august: 7, september: 8, october: 9, november: 10, december: 11
+    };
+    if (months[monthName] === undefined) return '';
+    if (ampm === 'am' && hour === 12) hour = 0;
+    if (ampm === 'pm' && hour < 12) hour += 12;
+    const d = new Date(year, months[monthName], day, hour, minute, second || 0, 0);
+    if (!isNaN(d.getTime())) return toDatetimeLocalValue(d);
+    return '';
+  }
+
+  function toDatetimeLocalValue(dateObj) {
+    const d = new Date(dateObj);
+    if (isNaN(d.getTime())) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function parseDateToLocalDate(value) {
+    const normalized = normalizeDateInputValue(value);
+    if (!normalized) return null;
+    const d = new Date(normalized);
+    if (isNaN(d.getTime())) return null;
+    return d;
+  }
+
+  function getOrdinal(day) {
+    if (day % 100 >= 11 && day % 100 <= 13) return 'th';
+    switch (day % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  }
+
+  function formatDateForDisplay(value) {
+    const d = parseDateToLocalDate(value);
+    if (!d) return String(value || '');
+    const months = [
+      'January','February','March','April','May','June',
+      'July','August','September','October','November','December'
+    ];
+    const day = d.getDate();
+    const suffix = getOrdinal(day);
+    let hh = d.getHours();
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hh >= 12 ? 'PM' : 'AM';
+    hh = hh % 12 || 12;
+    return `${day}${suffix} ${months[d.getMonth()]} ${d.getFullYear()} ${String(hh).padStart(2, '0')}:${mm} ${ampm}`;
+  }
+
+  function formatDateForFilename(value) {
+    const d = parseDateToLocalDate(value);
+    if (!d) return '0000-00-00_0000';
+    const pad = n => String(n).padStart(2, '0');
+    return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}_${pad(d.getHours())}${pad(d.getMinutes())}`;
+  }
+
+  function buildProofFileName(item) {
+    const existing = sanitizeFileName(item.proofName || '');
+    if (existing) return existing;
+    const amount = String(item.a || '').trim() || '0';
+    const typeLabel = String(item.t || '').trim() === 'taken' ? 'took' : 'returned';
+    const dateLabel = formatDateForFilename(item.d);
+    return `${amount} ${typeLabel} ${dateLabel}.png`;
+  }
+
+  function buildRelativeImageSrc(folderName, fileName) {
+    const folder = sanitizeFolderName(folderName);
+    const file = sanitizeFileName(fileName);
+    if (!folder || !file) return '';
+    return `./${encodeURIComponent(folder)}/${encodeURIComponent(file)}`;
+  }
+
+  function buildImageCandidates(folderName, fileName) {
+    const folder = sanitizeFolderName(folderName);
+    const file = sanitizeFileName(fileName);
+    if (!folder || !file) return [];
+    const decodedFile = (() => {
+      try { return decodeURIComponent(file); } catch (e) { return file; }
+    })();
+
+    return Array.from(new Set([
+      './' + encodeURIComponent(folder) + '/' + encodeURIComponent(file),
+      './' + folder + '/' + file,
+      './' + folder + '/' + encodeURIComponent(file),
+      './' + encodeURIComponent(folder) + '/' + file,
+      './' + folder + '/' + decodedFile
+    ].filter(Boolean)));
+  }
+
+  /* ===================== Dataset switcher logic ===================== */
+
+  function populateDatasetSelect() {
+    datasetSelect.innerHTML = DATASETS.map(function (ds) {
+      return '<option value="' + ds.id + '">' + ds.label + '</option>';
+    }).join('');
+    datasetSelect.value = activeDataset.id;
+  }
+
+  function updateDatasetInfo() {
+    const count = data.length;
+    const taken = data.filter(function (x) { return x.t === 'taken'; }).length;
+    const returned = data.filter(function (x) { return x.t === 'returned'; }).length;
+    const folderLabel = activeDataset.evidenceFolder
+      ? ('./' + activeDataset.evidenceFolder + '/')
+      : 'embedded in code (no folder needed)';
+
+    datasetInfo.innerHTML =
+      '<div class="dataset-info-row"><span>Records</span><b>' + count + '</b></div>' +
+      '<div class="dataset-info-row"><span>Taken / Returned</span><b>' + taken + ' / ' + returned + '</b></div>' +
+      '<div class="dataset-info-row"><span>Evidence source</span><b>' + folderLabel + '</b></div>';
+
+    if (inputDatasetLabel) inputDatasetLabel.textContent = activeDataset.label;
+
+    /* update the sticky sidebar bookmark */
+    const bm = document.getElementById('bookmarkText');
+    if (bm) bm.textContent = activeDataset.label;
+  }
+
+  function switchDataset(id, opts) {
+    opts = opts || {};
+    const ds = DATASETS.find(function (d) { return d.id === id; });
+    if (!ds) return;
+
+    if (editIndex !== null || document.getElementById('formModal').classList.contains('show')) {
+      closeForm();
+    }
+
+    activeDataset = ds;
+    data = loadWorkingData(ds);
+    editIndex = null;
+    existingProof = null;
+    existingProofName = '';
+    existingProofData = '';
+
+    verifyResult.classList.remove('show', 'ok', 'warn');
+    verifyResult.textContent = '';
+
+    datasetSelect.value = ds.id;
+    updateDatasetInfo();
+    render();
+
+    if (!opts.silent) {
+      showMessage('Dataset Loaded', 'Now viewing "' + ds.label + '".', 'success');
+    }
+  }
+
+  datasetSelect.addEventListener('change', function () {
+    if (locked) {
+      this.value = activeDataset.id;
+      showLockMessage('The input section is locked. Switching datasets is disabled.');
+      return;
+    }
+    switchDataset(this.value);
+  });
+
+  async function preloadImage(src, timeoutMs = 4000) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      let finished = false;
+      const timeout = setTimeout(() => {
+        if (finished) return;
+        finished = true;
+        img.src = '';
+        reject(new Error('Image not found.'));
+      }, timeoutMs);
+
+      img.onload = () => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timeout);
+        resolve(true);
+      };
+
+      img.onerror = () => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timeout);
+        reject(new Error('Image not found.'));
+      };
+
+      img.src = src;
+    });
+  }
+
+  async function verifyEvidenceImages() {
+    if (locked) {
+      showLockMessage('The input section is locked. Verifying evidence is disabled.');
+      return;
+    }
+
+    if (!data.length) {
+      verifyResult.className = 'verify-result show warn';
+      verifyResult.textContent = 'This dataset has no records yet, so there is nothing to verify.';
+      return;
+    }
+
+    verifyImagesBtn.disabled = true;
+    verifyResult.className = 'verify-result show';
+    verifyResult.textContent = 'Checking ' + data.length + ' evidence image(s)...';
+
+    let okCount = 0;
+    const missing = [];
+
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+
+      if (item.proofData && String(item.proofData).startsWith('data:')) {
+        okCount++;
+        continue;
+      }
+
+      const folder = sanitizeFolderName(activeDataset.evidenceFolder || '');
+      const proofName = sanitizeFileName(item.proofName || buildProofFileName(item));
+
+      if (!folder || !proofName) {
+        missing.push('Record ' + (i + 1) + ' (' + formatDateForDisplay(item.d) + '): no evidence folder/file configured.');
+        continue;
+      }
+
+      const candidates = buildImageCandidates(folder, proofName);
+      let resolved = false;
+      for (const src of candidates) {
+        try {
+          await preloadImage(src);
+          resolved = true;
+          break;
+        } catch (e) { /* try next candidate */ }
+      }
+
+      if (resolved) {
+        okCount++;
+      } else {
+        missing.push('Record ' + (i + 1) + ' (' + formatDateForDisplay(item.d) + '): "' + proofName + '" not found in ./' + folder + '/');
+      }
+    }
+
+    verifyImagesBtn.disabled = locked;
+
+    if (!missing.length) {
+      verifyResult.className = 'verify-result show ok';
+      verifyResult.textContent = 'All ' + okCount + ' of ' + data.length + ' evidence image(s) loaded successfully.';
+    } else {
+      verifyResult.className = 'verify-result show warn';
+      verifyResult.textContent = okCount + ' of ' + data.length + ' image(s) loaded. Missing:\n' + missing.join('\n');
+    }
+  }
+
+  verifyImagesBtn.addEventListener('click', function () {
+    verifyEvidenceImages();
+  });
+
+  /* ===================== Code-export helpers =====================
+     These build copy-paste-ready JavaScript text matching the same
+     style as the DATASETS block at the top of this file, so updates
+     made through the app (add/edit/delete) can be folded back into
+     the source code permanently. Nothing is sent anywhere — the file
+     is generated and downloaded entirely in your browser. */
+
+  function jsStringLiteral(value) {
+    return "'" + String(value == null ? '' : value)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/\r?\n/g, '\\n') + "'";
+  }
+
+  /* Bumps APP_VERSION forward: format is ddmmyyyy_X.Y — the date part
+     always becomes today's date, and the X.Y suffix increases by 0.1
+     each time. If the current version can't be parsed, starts at 1.0. */
+  function nextAppVersion(current) {
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    const datePart = dd + mm + yyyy;
+
+    let verNum = 1.0;
+    if (current) {
+      const m = String(current).match(/_([\d.]+)\s*$/);
+      if (m) {
+        const parsed = parseFloat(m[1]);
+        if (!Number.isNaN(parsed)) verNum = parsed + 0.1;
+      }
+    }
+    return datePart + '_' + verNum.toFixed(1);
+  }
+
+  function serializeItemObject(item, indent) {
+    const parts = [];
+    parts.push('d:' + jsStringLiteral(item.d));
+    parts.push('t:' + jsStringLiteral(item.t));
+    parts.push('a:' + jsStringLiteral(item.a));
+    parts.push('desc:' + jsStringLiteral(item.desc));
+    if (item.proofName) parts.push('proofName:' + jsStringLiteral(item.proofName));
+    if (item.proofData) parts.push('proofData:' + jsStringLiteral(item.proofData));
+    return indent + '{ ' + parts.join(', ') + ' },';
+  }
+
+  function serializeDatasetObject(ds, items, indent) {
+    indent = indent || '';
+    const inner = indent + '  ';
+    const itemLines = items.map(function (it) { return serializeItemObject(it, inner + '  '); });
+    return indent + '{\n' +
+      inner + 'id: ' + jsStringLiteral(ds.id) + ',\n' +
+      inner + 'label: ' + jsStringLiteral(ds.label) + ',\n' +
+      inner + 'evidenceFolder: ' + jsStringLiteral(ds.evidenceFolder || '') + ',\n' +
+      inner + 'items: [\n' + (itemLines.length ? itemLines.join('\n') + '\n' : '') + inner + ']\n' +
+      indent + '}';
+  }
+
+  function downloadTextFile(filename, content) {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function safeFileSlug(value) {
+    return String(value || 'dataset').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'dataset';
+  }
+
+  downloadDatasetBtn.addEventListener('click', function () {
+    if (locked) {
+      showLockMessage('The input section is locked. Downloading data is disabled.');
+      return;
+    }
+
+    const code = serializeDatasetObject(activeDataset, data, '  ');
+    const stamp = new Date().toLocaleString();
+    const currentVer = (typeof APP_VERSION !== 'undefined' && APP_VERSION) ? APP_VERSION : '03072026_1.0';
+    const suggestedVer = nextAppVersion(currentVer);
+    const content =
+      '/* =====================================================================\n' +
+      '   DATASET UPDATE — "' + activeDataset.label + '" (id: ' + activeDataset.id + ')\n' +
+      '   Generated: ' + stamp + '\n' +
+      '   Current APP_VERSION in dataset.js: ' + currentVer + '\n' +
+      '   ---------------------------------------------------------------------\n' +
+      '   This is the current, up-to-date version of this one dataset — every\n' +
+      '   add / edit / delete you made through the app for this tracker is\n' +
+      '   included below.\n' +
+      '\n' +
+      '   HOW TO USE\n' +
+      '   1. Open dataset.js (NOT index.html) in a text editor.\n' +
+      '   2. Find the dataset object with id: \'' + activeDataset.id + '\' inside\n' +
+      '      the "const DATASETS = [ ... ];" array.\n' +
+      '   3. Select that whole object (from its opening "{" to its closing "}")\n' +
+      '      and replace it with the object below.\n' +
+      '   4. Save dataset.js. The change is now permanent — index.html itself\n' +
+      '      never needs to be touched.\n' +
+      '\n' +
+      '   WANT THE VERSION NUMBER TO REFLECT THIS UPDATE TOO?\n' +
+      '   Find the line "const APP_VERSION = ..." near the bottom of dataset.js\n' +
+      '   and change it to:\n' +
+      '     const APP_VERSION = ' + jsStringLiteral(suggestedVer) + ';\n' +
+      '   (Or just use the "Download Full App Data" button instead — it does\n' +
+      '   this automatically.)\n' +
+      '   ===================================================================== */\n' +
+      '\n' + code + ',\n';
+
+    downloadTextFile(safeFileSlug(activeDataset.id) + '-dataset-update.txt', content);
+    showMessage('Download Started', 'The updated "' + activeDataset.label + '" dataset object has been downloaded. Open the .txt file, copy the object, and paste it over the matching one in dataset.js.', 'success');
+  });
+
+  downloadFullDataBtn.addEventListener('click', function () {
+    if (locked) {
+      showLockMessage('The input section is locked. Downloading data is disabled.');
+      return;
+    }
+
+    const stamp = new Date().toLocaleString();
+    const datasetCode = DATASETS.map(function (ds) {
+      return serializeDatasetObject(ds, loadWorkingData(ds), '  ');
+    }).join(',\n');
+
+    const appStateCode =
+      'const DEFAULT_APP_STATE = {\n' +
+      '  locked: ' + (locked ? 'true' : 'false') + ',\n' +
+      '  password: ' + jsStringLiteral(password) + ',\n' +
+      '  passwordHint: ' + jsStringLiteral(passwordHint) + '\n' +
+      '};';
+
+    const currentVer = (typeof APP_VERSION !== 'undefined' && APP_VERSION) ? APP_VERSION : '03072026_1.0';
+    const newVer = nextAppVersion(currentVer);
+    const versionCode = 'const APP_VERSION = ' + jsStringLiteral(newVer) + ';';
+
+    const content =
+      '/* =====================================================================\n' +
+      '   TRANSACTION TRACKER — DATASET FILE  (dataset.js)\n' +
+      '   Generated: ' + stamp + '\n' +
+      '   =====================================================================\n' +
+      '   This is a complete, ready-to-use replacement for dataset.js, built\n' +
+      '   from everything currently saved in this browser:\n' +
+      '     1. Every dataset, with its latest add / edit / delete changes.\n' +
+      '     2. The current Secure Input lock state, password, and hint.\n' +
+      '     3. The app version, automatically bumped from ' + currentVer + '\n' +
+      '        to ' + newVer + '.\n' +
+      '\n' +
+      '   HOW TO USE\n' +
+      '   1. Delete the old dataset.js sitting next to index.html.\n' +
+      '   2. Rename this downloaded file to exactly:  dataset.js\n' +
+      '   3. Put it in the same folder as index.html (replacing the old one).\n' +
+      '   4. Reopen index.html — every change you made is now permanent, even\n' +
+      '      after clearing this browser\'s storage. index.html itself was\n' +
+      '      never touched.\n' +
+      '   ===================================================================== */\n' +
+      '\n' +
+      '/* ---- 1. DATASETS ---- */\n' +
+      'const DATASETS = [\n' + datasetCode + '\n];\n' +
+      '\n' +
+      '/* Which dataset id should load automatically every time index.html is\n' +
+      '   opened. Change this string to any "id" above to change the default. */\n' +
+      'const DEFAULT_DATASET_ID = ' + jsStringLiteral(activeDataset.id) + ';\n' +
+      '\n' +
+      '/* ---- 2. DEFAULT_APP_STATE (auto-lock on load) ---- */\n' +
+      appStateCode + '\n' +
+      '\n' +
+      '/* ---- 3. APP_VERSION (shown in the footer of every page) ---- */\n' +
+      versionCode + '\n';
+
+    downloadTextFile('dataset.js', content);
+
+    const versionEl = document.getElementById('appVersionText');
+    if (versionEl) versionEl.textContent = 'Version ' + newVer;
+
+    showMessage('Download Started', 'A complete, ready-to-use dataset.js has been downloaded (version bumped to ' + newVer + '). Delete the old dataset.js and put this one in its place — index.html does not need to change.', 'success');
+  });
+
+  function openSection(id) {
+    const next = document.getElementById(id);
+    if (!next) return;
+
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const activeSection = sections.find(section => section.classList.contains('active'));
+
+    sections.forEach(section => {
+      const isNext = section.id === id;
+      const isCurrent = section === activeSection;
+
+      if (isNext) {
+        section.style.display = 'block';
+        section.classList.remove('leaving');
+        section.setAttribute('aria-hidden', 'false');
+      } else if (isCurrent) {
+        section.classList.remove('active');
+        section.classList.add('leaving');
+        section.setAttribute('aria-hidden', 'true');
+        setTimeout(() => {
+          if (!section.classList.contains('active')) {
+            section.classList.remove('leaving');
+            section.style.display = 'none';
+          }
+        }, 380);
+      } else {
+        section.classList.remove('active');
+        section.classList.remove('leaving');
+        section.style.display = 'none';
+        section.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    next.style.display = 'block';
+    next.offsetHeight;
+    requestAnimationFrame(() => {
+      next.classList.add('active');
+    });
+
+    currentSectionId = id;
+    syncNavActive(id);
+    render();
+    scheduleLayoutUpdate(id);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scheduleLayoutUpdate(id);
+        smoothScrollToTop(next);
+      });
+    });
+
+    /* dashboard: entry shine sweep + confetti when fully settled */
+    if (id === 'dashboard') {
+      setTimeout(function () {
+        const grid = document.querySelector('.dash-3-grid');
+        if (grid) {
+          grid.classList.remove('shine-active');
+          void grid.offsetWidth;
+          grid.classList.add('shine-active');
+        }
+        if (window.__dashRemaining !== undefined && window.__dashRemaining <= 0) {
+          launchConfetti();
+        }
+      }, 340);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     CONFETTI — canvas particle burst when balance = ₹0
+     ═══════════════════════════════════════════════════════════════════ */
+  function launchConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:99999;';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width = window.innerWidth;
+    const H = canvas.height = window.innerHeight;
+    const COLS = ['#60a5fa','#34d399','#fbbf24','#f472b6','#a78bfa',
+                  '#fb923c','#38bdf8','#4ade80','#f9a8d4','#c084fc','#67e8f9'];
+    const particles = Array.from({length:200}, (_, i) => ({
+      x:  Math.random() * W,
+      y: -20 - Math.random() * H * .6,
+      vx: (Math.random() - .5) * 5,
+      vy: 1.8 + Math.random() * 4,
+      color: COLS[i % COLS.length],
+      r: 3 + Math.random() * 5,
+      w: 5 + Math.random() * 10, h: 3 + Math.random() * 5,
+      rot: Math.random() * 360,
+      rotV: (Math.random() - .5) * 11,
+      isRect: Math.random() > .35
+    }));
+    let t = 0;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => {
+        p.x += p.vx + Math.sin(t * .02 + p.y * .012) * .55;
+        p.y += p.vy;  p.rot += p.rotV;  p.vy += .06;
+        if (p.y > H + 30) { p.y = -20; p.x = Math.random() * W; p.vy = 1.8 + Math.random() * 3.5; }
+        const a = Math.max(0, 1 - Math.max(0, p.y - H * .55) / (H * .43));
+        ctx.save(); ctx.globalAlpha = a;
+        ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        if (p.isRect) { ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); }
+        else { ctx.beginPath(); ctx.ellipse(0,0,p.r,p.r*.55,0,0,Math.PI*2); ctx.fill(); }
+        ctx.restore();
+      });
+      t++;
+      if (t < 210) requestAnimationFrame(draw);
+      else { ctx.clearRect(0,0,W,H); canvas.remove(); }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  function resolveProofSrc(item) {
+    if (item.proofData && String(item.proofData).startsWith('data:')) return item.proofData;
+    const fileName = sanitizeFileName(item.proofName || '');
+    if (!fileName) return '';
+    const folder = sanitizeFolderName(activeDataset.evidenceFolder || '');
+    if (!folder) return '';
+    return buildRelativeImageSrc(folder, fileName);
+  }
+
+  function animateValue(id, end) {
+    const start = 0;
+    const duration = 900;
+    let startTime = null;
+    function easeOutExpo(t) {
+      return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    }
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const value = Math.round(easeOutExpo(progress) * (end - start) + start);
+      const target = document.getElementById(id);
+      if (target) target.innerText = '₹' + value.toLocaleString('en-IN');
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     DASHBOARD CHART ENTRANCE SEQUENCE
+     ---------------------------------------------------------------------
+     Runs every time the dashboard is (re)rendered. Order:
+       1. The straight bar fills from 0 -> its true percentage.
+       2. The circular donut arc grows from empty -> its true percentage,
+          in step with the bar.
+       3. Once those settle, the handwriting arrow "draws" itself with a
+          genuine SVG stroke animation (measured via getTotalLength, so it
+          works correctly for both the normal and flipped arrow shapes).
+       4. The instant the arrow finishes, the "X% returned" pill pops in.
+     ═══════════════════════════════════════════════════════════════════ */
+  function animateDashboardCharts(returnPerc, donutOffset, donutCircumference, hasBalanceArc) {
+    const BAR_DURATION = 1200;    // matches .progress-fill CSS transition
+    const ARROW_DELAY   = BAR_DURATION - 50;
+    const ARROW_DRAW_MS = 600;
+
+    // 1. Straight bar: 0% -> target%
+    const fillEl = document.getElementById('progressFillBar');
+    if (fillEl) {
+      void fillEl.offsetWidth; // ensure the 0% starting state is committed
+      requestAnimationFrame(() => {
+        fillEl.style.width = returnPerc + '%';
+      });
+    }
+
+    // 2. Donut arc: fully-empty -> target offset (only when there's an arc,
+    //    i.e. not the "All Clear" state)
+    if (hasBalanceArc) {
+      const arcMain = document.getElementById('donutArcMain');
+      const arcGlow = document.getElementById('donutArcGlow');
+      if (arcMain) void arcMain.getBoundingClientRect();
+      requestAnimationFrame(() => {
+        if (arcMain) arcMain.style.strokeDashoffset = String(donutOffset);
+        if (arcGlow) arcGlow.style.strokeDashoffset = String(donutOffset);
+      });
+    }
+
+    // 3 & 4. Handwriting arrow draws itself, then the pill pops in
+    if (returnPerc > 0) {
+      setTimeout(() => {
+        const dot = document.getElementById('arrowDot');
+        const path = document.getElementById('arrowPath');
+        const head = document.getElementById('arrowHead');
+        const pillWrap = document.getElementById('arrowPillWrap');
+
+        if (dot) dot.style.opacity = '1';
+
+        if (path) {
+          const len = path.getTotalLength();
+          path.style.strokeDasharray = String(len);
+          path.style.strokeDashoffset = String(len);
+          path.style.opacity = '1'; // safe now — dashoffset already hides the stroke
+          path.getBoundingClientRect(); // force reflow before animating
+          path.style.transition = 'stroke-dashoffset ' + (ARROW_DRAW_MS / 1000) + 's cubic-bezier(.4,0,.2,1)';
+          requestAnimationFrame(() => {
+            path.style.strokeDashoffset = '0';
+          });
+        }
+
+        setTimeout(() => {
+          if (head) head.style.opacity = '1';
+          if (pillWrap) {
+            pillWrap.style.opacity = '1';
+            pillWrap.style.transform = 'scale(1) translateY(0)';
+          }
+        }, ARROW_DRAW_MS - 60);
+      }, ARROW_DELAY);
+    }
+  }
+
+  function validateCurrentRowForSave(dateValue, amountValue, descriptionValue, proofFile, existingProofUsed) {
+    if (!String(dateValue || '').trim()) return 'Date is required.';
+    if (!String(amountValue || '').trim()) return 'Amount is required.';
+    if (!String(descriptionValue || '').trim()) return 'Description is required.';
+    if (!proofFile && !existingProofUsed) return 'Evidence image file is required.';
+    if (!normalizeDateInputValue(dateValue)) return 'Please select a valid date and time.';
+    if (Number.isNaN(Number(amountValue))) return 'Amount must be a valid number.';
+    return '';
+  }
+
+  function setDeleteMode(active) {
+    formModal.classList.toggle('deleting', active);
+  }
+
+  function showLockMessage(message) {
+    showMessage('Access Restricted', message, 'error');
+  }
+
+  function openPasswordSetup() {
+    if (securityBusy) return;
+    securityBusy = true;
+
+    openPopup({
+      title: 'Set Password',
+      message: 'Password and hint are required to enable the secure input section.',
+      fields: [
+        { type: 'password', placeholder: 'Enter password' },
+        { type: 'text', placeholder: 'Enter hint' }
+      ],
+      confirmText: 'Save Password',
+      showCancel: true,
+      cancelText: 'Cancel',
+      originEl: lockEl,
+      onConfirm: function (pass, hint) {
+        pass = (pass || '').trim();
+        hint = (hint || '').trim();
+
+        if (!pass || !hint) {
+          showPopupError('Password and hint are both required.');
+          return;
+        }
+
+        password = pass;
+        passwordHint = hint;
+        localStorage.setItem('password', password);
+        localStorage.setItem('passwordHint', passwordHint);
+        setLockedState(true);
+        closePopup();
+        showMessage('Password Saved', 'Secure input section has been enabled.', 'success');
+      },
+      onCancel: function () {
+        securityBusy = false;
+        lockEl.checked = false;
+        closePopup();
+      }
+    });
+  }
+
+  function openUnlockPasswordPrompt() {
+    if (securityBusy) return;
+    securityBusy = true;
+    lockEl.checked = true;
+
+    openPopup({
+      title: 'Unlock Secure Input Section',
+      message: 'Enter the password to disable secure input. Forgot password is available below.',
+      fields: [{ type: 'password', placeholder: 'Enter password' }],
+      confirmText: 'Unlock',
+      showCancel: true,
+      cancelText: 'Cancel',
+      altText: 'Forgot Password',
+      originEl: lockEl,
+      onConfirm: function (value) {
+        value = (value || '').trim();
+        if (!value) {
+          showPopupError('Please enter the password.');
+          return;
+        }
+
+        if (value === password) {
+          setLockedState(false);
+          closePopup();
+          showMessage('Unlocked', 'Secure input section has been disabled.', 'success');
+        } else {
+          showPopupError('The password entered is not correct.');
+        }
+      },
+      onCancel: function () {
+        securityBusy = false;
+        lockEl.checked = true;
+        closePopup();
+      },
+      onAlt: function () {
+        transitionPopupAndThen(openForgotPasswordFlow);
+      }
+    });
+  }
+
+  function openForgotPasswordFlow() {
+    if (securityBusy) return;
+    securityBusy = true;
+
+    if (!passwordHint) {
+      securityBusy = false;
+      lockEl.checked = true;
+      showMessage('Hint Missing', 'No hint is available for password recovery.', 'error');
+      return;
+    }
+
+    openPopup({
+      title: 'Forgot Password',
+      message: 'Enter the saved hint to continue.',
+      fields: [{ type: 'text', placeholder: 'Enter hint' }],
+      confirmText: 'Verify Hint',
+      showCancel: true,
+      cancelText: 'Cancel',
+      onConfirm: function (hintValue) {
+        hintValue = (hintValue || '').trim();
+
+        if (!hintValue) {
+          showPopupError('Please enter the hint.');
+          return;
+        }
+
+        if (hintValue === passwordHint) {
+          transitionPopupAndThen(openResetPasswordPrompt);
+        } else {
+          showPopupError('The hint entered does not match.');
+        }
+      },
+      onCancel: function () {
+        securityBusy = false;
+        lockEl.checked = true;
+        closePopup();
+      }
+    });
+  }
+
+  function openResetPasswordPrompt() {
+    if (securityBusy) return;
+    securityBusy = true;
+
+    openPopup({
+      title: 'Reset Password',
+      message: 'Enter a new password and confirm it.',
+      fields: [
+        { type: 'password', placeholder: 'New password' },
+        { type: 'password', placeholder: 'Confirm password' }
+      ],
+      confirmText: 'Reset Password',
+      showCancel: true,
+      cancelText: 'Cancel',
+      onConfirm: function (newPass, confirmPass) {
+        newPass = (newPass || '').trim();
+        confirmPass = (confirmPass || '').trim();
+
+        if (!newPass || !confirmPass) {
+          showPopupError('Both password fields are required.');
+          return;
+        }
+
+        if (newPass !== confirmPass) {
+          showPopupError('New password and confirm password must match.');
+          return;
+        }
+
+        password = newPass;
+        localStorage.setItem('password', password);
+        setLockedState(true);
+        closePopup();
+        showMessage('Password Reset', 'Password has been reset successfully.', 'success');
+      },
+      onCancel: function () {
+        securityBusy = false;
+        lockEl.checked = true;
+        closePopup();
+      }
+    });
+  }
+
+  msgOkBtn.addEventListener('click', function () {
+    const handler = popupConfirmHandler;
+    const v1 = msgInput1.value;
+    const v2 = msgInput2.value;
+    if (handler) handler(v1, v2);
+  });
+
+  msgCancelBtn.addEventListener('click', function () {
+    const handler = popupCancelHandler;
+    if (handler) handler();
+  });
+
+  msgAltBtn.addEventListener('click', function () {
+    const handler = popupAltHandler;
+    if (handler) handler();
+  });
+
+  popup.addEventListener('click', function (e) {
+    if (e.target === popup) {
+      if (typeof popupCancelHandler === 'function') {
+        popupCancelHandler();
+      } else {
+        closePopup();
+      }
+    }
+  });
+
+  lockEl.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (securityBusy) return;
+
+    if (!locked) {
+      openPasswordSetup();
+    } else {
+      openUnlockPasswordPrompt();
+    }
+  });
+
+  lockEl.addEventListener('change', function () {
+    lockEl.checked = locked;
+  });
+
+  lockEl.addEventListener('keydown', function (e) {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      if (securityBusy) return;
+      if (!locked) openPasswordSetup();
+      else openUnlockPasswordPrompt();
+    }
+  });
+
+  window.openSection = openSection;
+
+  function showFormError(message) {
+    const el = document.getElementById('formError');
+    if (!el) return;
+    el.textContent = message;
+    el.classList.add('show');
+  }
+
+  function clearFormError() {
+    const el = document.getElementById('formError');
+    if (!el) return;
+    el.textContent = '';
+    el.classList.remove('show');
+  }
+
+  window.openForm = function () {
+    if (locked) {
+      showLockMessage('The input section is locked. Adding new records is disabled.');
+      return;
+    }
+    if (deleteInProgress) return;
+
+    editIndex = null;
+    existingProof = null;
+    existingProofName = '';
+    existingProofData = '';
+    clearFormError();
+    formTitle.textContent = 'Add Input';
+    setButtonContent(saveBtn, 'save', 'Save');
+    setButtonContent(saveMoreBtn, 'saveMore', 'Save & Add More');
+    saveMoreBtn.style.display = 'inline-flex';
+    deleteBtn.style.display = 'none';
+    setDeleteMode(false);
+    document.getElementById('date').value = '';
+    document.getElementById('amount').value = '';
+    document.getElementById('desc').value = '';
+    document.getElementById('proof').value = '';
+    animateModalOpen(document.getElementById('formModal'), addBtn);
+  };
+
+  window.closeForm = function (done) {
+    setDeleteMode(false);
+    animateModalClose(formModal, function () {
+      formModal.style.display = 'flex';
+      if (typeof done === 'function') done();
+    }, 260);
+  };
+
+  formModal.addEventListener('click', function (e) {
+    if (e.target === formModal) {
+      closeForm();
+    }
+  });
+
+  window.editItem = function (index) {
+    if (locked) {
+      showLockMessage('The input section is locked. Editing is disabled.');
+      return;
+    }
+    if (deleteInProgress) return;
+
+    const item = data[index];
+    editIndex = index;
+    existingProof = item.proof || '';
+    existingProofName = item.proofName || '';
+    existingProofData = item.proofData || '';
+    clearFormError();
+
+    formTitle.textContent = 'Edit Input';
+    setButtonContent(saveBtn, 'save', 'Update');
+    setButtonContent(saveMoreBtn, 'saveMore', 'Save & Add More');
+    saveMoreBtn.style.display = 'none';
+    deleteBtn.style.display = 'inline-flex';
+    setDeleteMode(false);
+
+    document.getElementById('date').value = normalizeDateInputValue(item.d);
+    document.getElementById('type').value = item.t;
+    document.getElementById('amount').value = item.a;
+    document.getElementById('desc').value = item.desc;
+    document.getElementById('proof').value = '';
+    animateModalOpen(document.getElementById('formModal'));
+  };
+
+  window.askDeleteCurrent = function () {
+    if (editIndex === null || deleteInProgress) return;
+
+    openPopup({
+      title: 'Confirm Delete',
+      message: 'Really want to delete right...?? the record can not be reversed..',
+      confirmText: 'Yes, Delete',
+      showCancel: true,
+      cancelText: 'No',
+      onConfirm: function () {
+        const currentIndex = editIndex;
+        deleteInProgress = true;
+
+        closePopupAnimated(function () {
+          const card = document.querySelector(`.item-card[data-index="${currentIndex}"]`);
+          if (card) card.classList.add('deleting');
+
+          setDeleteMode(true);
+
+          setTimeout(() => {
+            data.splice(currentIndex, 1);
+            saveWorkingData(activeDataset, data);
+
+            editIndex = null;
+            existingProof = null;
+            existingProofName = '';
+            existingProofData = '';
+
+            render();
+
+            setTimeout(() => {
+              deleteInProgress = false;
+              setDeleteMode(false);
+              closeForm();
+            }, 120);
+
+            showMessage('Deleted', 'Record deleted successfully.', 'success');
+          }, 850);
+        });
+      },
+      onCancel: function () {
+        closePopupAnimated(function () {
+          deleteInProgress = false;
+          showMessage('Cancelled', 'Delete action was cancelled.', 'info');
+        });
+      }
+    });
+  };
+
+  window.saveInput = function (another) {
+    if (locked) {
+      showLockMessage('The input section is locked. Saving is disabled.');
+      return;
+    }
+
+    const d = document.getElementById('date').value;
+    const t = document.getElementById('type').value;
+    const a = document.getElementById('amount').value;
+    const descVal = document.getElementById('desc').value;
+    const file = document.getElementById('proof').files[0];
+    const existingProofUsed = !!(editIndex !== null && (existingProofData || existingProofName || existingProof));
+
+    const validationMessage = validateCurrentRowForSave(d, a, descVal, file, existingProofUsed);
+    if (validationMessage) {
+      showFormError(validationMessage);
+      return;
+    }
+    clearFormError();
+
+    const normalizedDate = normalizeDateInputValue(d);
+    const amountValue = String(a).trim();
+
+    function saveRecord(proofName, proofData) {
+      const obj = { d: normalizedDate, t, a: amountValue, desc: descVal, proofName, proofData };
+      if (editIndex !== null) {
+        data[editIndex] = obj;
+      } else {
+        data.push(obj);
+      }
+      saveWorkingData(activeDataset, data);
+      editIndex = null;
+      existingProof = null;
+      existingProofName = '';
+      existingProofData = '';
+      clearFormError();
+      if (!another) closeForm();
+      render();
+      showMessage('Saved', 'Input record saved successfully.', 'success');
+    }
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const dataUrl = e.target.result;
+        const generatedName = buildProofFileName({
+          d: normalizedDate,
+          t,
+          a: amountValue,
+          desc: descVal,
+          proofName: file.name
+        });
+        saveRecord(generatedName, dataUrl);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      if (editIndex !== null && existingProofUsed) {
+        saveRecord(existingProofName || '', existingProofData || '');
+      } else {
+        showFormError('Evidence image file is required.');
+      }
+    }
+  };
+
+  window.openImage = function (src) {
+    const modal = document.getElementById('imgModal');
+    modal.innerHTML = `<img src="${src}" alt="Proof image" onerror="this.remove()" onclick="event.stopPropagation()">`;
+    animateModalOpen(modal);
+  };
+
+  window.closeImageModal = function () {
+    const modal = document.getElementById('imgModal');
+    if (!modal.classList.contains('show')) return;
+    animateModalClose(modal, function () {
+      modal.classList.remove('show', 'closing');
+      modal.innerHTML = '';
+      modal.style.display = 'none';
+    }, 260);
+  };
+
+  function render() {
+    syncControls();
+    updateDatasetInfo();
+
+    const list = document.getElementById('inputList');
+    list.innerHTML = '';
+
+    data.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'item-card';
+      div.setAttribute('data-type', item.t);
+      div.setAttribute('data-index', String(i));
+      const proofSrc = resolveProofSrc(item);
+      const amtFormatted = Number(item.a).toLocaleString('en-IN');
+      const isTaken = item.t === 'taken';
+      const badgeSvg = isTaken
+        ? `<svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M12 20V4M5 11l7-7 7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+        : `<svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M5 13l7 7 7-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+      div.innerHTML = `
+        <div class="top">
+          <div class="date-text">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="opacity:.6"><rect x="3" y="4" width="18" height="18" rx="3" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            ${formatDateForDisplay(item.d)}
+          </div>
+          <span class="badge ${item.t}">${badgeSvg}${item.t}</span>
+        </div>
+        <div class="amt">₹${amtFormatted}</div>
+        ${item.desc ? `<div class="desc">${item.desc}</div>` : ''}
+        ${proofSrc ? `<img src="${proofSrc}" class="preview-img" loading="lazy" onerror="this.style.display='none'" onclick="openImage('${proofSrc.replace(/'/g,"\\'")}')">` : ''}
+        <div class="actions">
+          <button class="secondary" onclick="editItem(${i})" ${locked ? 'disabled' : ''}>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span>Edit</span>
+          </button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+
+    const dash = document.getElementById('dashboardContent');
+
+
+    if (!data.length) {
+      dash.innerHTML = `
+        <div class="empty">
+          <div style="width:72px;height:72px;margin:0 auto 18px;border-radius:22px;
+            background:linear-gradient(135deg,rgba(37,99,235,.14),rgba(59,130,246,.08));
+            border:1px solid rgba(59,130,246,.16);
+            display:flex;align-items:center;justify-content:center;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="opacity:.5">
+              <path d="M9 11l3 3L22 4" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="font-size:16px;font-weight:700;color:#c8d8ec;margin-bottom:6px;">No records yet</div>
+          <div style="font-size:13px;color:var(--muted2);margin-bottom:24px;line-height:1.6;">Add your first transaction to start<br>tracking taken and returned amounts.</div>
+          <button class="action-btn primary" onclick="openSection('input')" style="width:auto;padding:0 28px;height:44px;font-size:14px;">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <span>Add First Record</span>
+          </button>
+        </div>`;
+      return;
+    }
+
+    const taken        = data.filter(x => x.t === 'taken').reduce((s,x) => s + Number(x.a), 0);
+    const returned     = data.filter(x => x.t === 'returned').reduce((s,x) => s + Number(x.a), 0);
+    const remaining    = taken - returned;
+    window.__dashRemaining = remaining;
+    /* Precise percentage with decimals — never rounds up to 100% unless
+       truly fully returned, and never rounds down to 0% if something has
+       actually been returned/remains, so the UI always reflects reality
+       exactly (e.g. 94.33%, 96.78%) instead of coarse whole-number steps. */
+    let returnPerc;
+    if (!taken) {
+      returnPerc = 0;
+    } else if (returned >= taken) {
+      returnPerc = 100;
+    } else {
+      returnPerc = Math.round((returned / taken) * 10000) / 100;
+      if (returnPerc >= 100) returnPerc = 99.99;
+      if (returnPerc <= 0 && returned > 0) returnPerc = 0.01;
+    }
+    const remainingPerc = taken ? Math.round((100 - returnPerc) * 100) / 100 : 0;
+    /* clean formatting: whole numbers show without decimals, fractional
+       values show exactly 2 decimal places */
+    const fmtPerc = (v) => (Number.isInteger(v) ? String(v) : v.toFixed(2));
+
+    /* ── emotion colours for bar / card 2 ── */
+    const barGrad = returnPerc < 20
+      ? 'linear-gradient(90deg,#1e3a8a,#1d4ed8,#3b82f6,#60a5fa)'
+      : returnPerc < 40 ? 'linear-gradient(90deg,#075985,#0284c7,#0ea5e9,#38bdf8)'
+      : returnPerc < 60 ? 'linear-gradient(90deg,#065f46,#0d9488,#10b981,#34d399)'
+      : returnPerc < 80 ? 'linear-gradient(90deg,#047857,#059669,#10b981,#6ee7b7)'
+      : returnPerc < 95 ? 'linear-gradient(90deg,#14532d,#15803d,#22c55e,#86efac)'
+      : 'linear-gradient(90deg,#713f12,#a16207,#d97706,#fbbf24,#fef08a)';
+    const barGlow = returnPerc < 20 ? 'rgba(59,130,246,.55)'
+      : returnPerc < 40 ? 'rgba(14,165,233,.55)'
+      : returnPerc < 60 ? 'rgba(16,185,129,.55)'
+      : returnPerc < 80 ? 'rgba(52,211,153,.55)'
+      : returnPerc < 95 ? 'rgba(134,239,172,.55)'
+      : 'rgba(251,191,36,.65)';
+    const retC    = returnPerc < 40 ? '#38bdf8' : returnPerc < 70 ? '#34d399' : returnPerc < 95 ? '#86efac' : '#fbbf24';
+    const retCRGB = returnPerc < 40 ? '56,189,248' : returnPerc < 70 ? '52,211,153' : returnPerc < 95 ? '134,239,172' : '251,191,36';
+    const retIconBg = returnPerc < 40
+      ? 'rgba(2,132,199,.22),rgba(14,165,233,.1));border:1px solid rgba(14,165,233,.26)'
+      : returnPerc < 70
+      ? 'rgba(5,150,105,.22),rgba(16,185,129,.1));border:1px solid rgba(16,185,129,.26)'
+      : returnPerc < 95
+      ? 'rgba(21,128,61,.22),rgba(34,197,94,.1));border:1px solid rgba(134,239,172,.28)'
+      : 'rgba(161,98,7,.22),rgba(202,138,4,.1));border:1px solid rgba(251,191,36,.28)';
+    const retAmtGrad = returnPerc < 40 ? '#7dd3fc,#38bdf8'
+      : returnPerc < 70 ? '#6ee7b7,#34d399'
+      : returnPerc < 95 ? '#bbf7d0,#86efac' : '#fef08a,#fbbf24';
+    const retBorder = `1px solid rgba(${retCRGB},.24)`;
+
+    /* ── balance / outstanding colours ── */
+    const bal    = remaining;
+    const ratio  = taken > 0 ? bal / taken : 0;
+    const bc     = bal <= 0 ? '#34d399' : ratio > .65 ? '#f87171' : ratio > .35 ? '#fb923c' : '#fbbf24';
+    const bcRGB  = bal <= 0 ? '52,211,153' : ratio > .65 ? '248,113,113' : ratio > .35 ? '251,146,60' : '251,191,36';
+    const bgc    = bal <= 0 ? '#6ee7b7,#34d399' : ratio > .65 ? '#fca5a5,#f87171' : ratio > .35 ? '#fdba74,#fb923c' : '#fde68a,#fbbf24';
+    const bgl    = bal <= 0 ? 'rgba(52,211,153,.3)' : ratio > .65 ? 'rgba(248,113,113,.3)' : ratio > .35 ? 'rgba(251,146,60,.3)' : 'rgba(251,191,36,.3)';
+    const bline  = bal <= 0
+      ? 'linear-gradient(90deg,transparent,rgba(52,211,153,.72),transparent)'
+      : ratio > .65 ? 'linear-gradient(90deg,transparent,rgba(248,113,113,.72),transparent)'
+      : ratio > .35 ? 'linear-gradient(90deg,transparent,rgba(251,146,60,.72),transparent)'
+      : 'linear-gradient(90deg,transparent,rgba(251,191,36,.72),transparent)';
+    const bPerc  = bal <= 0 ? 0 : remainingPerc;
+    const bLabel = bal <= 0 ? 'settled' : 'left';
+    const balBg  = bal <= 0
+      ? 'rgba(5,150,105,.2),rgba(16,185,129,.1));border:1px solid rgba(16,185,129,.24)'
+      : ratio > .65 ? 'rgba(220,38,38,.2),rgba(239,68,68,.1));border:1px solid rgba(239,68,68,.24)'
+      : ratio > .35 ? 'rgba(194,65,12,.2),rgba(234,88,12,.1));border:1px solid rgba(234,88,12,.24)'
+      : 'rgba(161,98,7,.2),rgba(202,138,4,.1));border:1px solid rgba(202,138,4,.24)';
+    const balBorder  = `1px solid rgba(${bcRGB},.24)`;
+    const remainGrad = bal <= 0 ? '#6ee7b7,#34d399' : '#fca5a5,#f87171';
+
+    /* ── donut geometry ── */
+    const R    = 42;
+    const CIRC = (2 * Math.PI * R).toFixed(2);
+    const OFF  = (2 * Math.PI * R * (1 - bPerc / 100)).toFixed(2);
+    const endA = (-90 + bPerc * 3.6) * Math.PI / 180;
+    const endX = (50 + R * Math.cos(endA)).toFixed(2);
+    const endY = (50 + R * Math.sin(endA)).toFixed(2);
+    const scX  = '50', scY = String(50 - R);  /* start cap at 12 o'clock */
+
+    /* ── annotation position (clamped so text stays on screen) ── */
+    const flipArrow = returnPerc > 62;  /* flip direction near the right edge so nothing clips */
+
+    dash.innerHTML = `
+
+      <div class="dash-3-grid">
+
+        <!-- ══ CARD 1 · TOTAL TAKEN ══════════════════════════════════ -->
+        <div class="dc" style="
+            background:linear-gradient(155deg,rgba(9,15,33,.92),rgba(5,9,22,.96));
+            border:1px solid rgba(59,130,246,.24);border-radius:22px;padding:28px 22px;
+            box-shadow:0 2px 8px rgba(0,0,0,.28),0 18px 44px rgba(0,0,0,.5),0 0 0 1px rgba(59,130,246,.04) inset;
+            display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+          <div class="entry-shine"></div>
+          <div style="position:absolute;inset:0 0 auto 0;height:2px;border-radius:22px 22px 0 0;
+              background:linear-gradient(90deg,transparent,rgba(96,165,250,.9),transparent);pointer-events:none;"></div>
+          <div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:220px;height:160px;
+              background:radial-gradient(ellipse,rgba(59,130,246,.11),transparent 68%);pointer-events:none;"></div>
+
+          <div style="width:48px;height:48px;border-radius:15px;
+              background:linear-gradient(135deg,rgba(37,99,235,.28),rgba(59,130,246,.13));
+              border:1px solid rgba(59,130,246,.3);
+              box-shadow:0 4px 22px rgba(37,99,235,.26),inset 0 1px 0 rgba(147,197,253,.15);
+              display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 20V4M5 11l7-7 7 7" stroke="#60a5fa" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;">Total Taken</div>
+          <h2 id="takenVal" style="margin:0;font-size:30px;font-weight:900;letter-spacing:-.7px;line-height:1;
+              background:linear-gradient(135deg,#93c5fd,#60a5fa);-webkit-background-clip:text;background-clip:text;
+              -webkit-text-fill-color:transparent;filter:drop-shadow(0 0 16px rgba(96,165,250,.32));">&#8377;0</h2>
+        </div>
+
+        <!-- ══ CARD 2 · TOTAL RETURNED + bar ═════════════════════════ -->
+        <div class="dc" style="
+            background:linear-gradient(155deg,rgba(6,13,24,.94),rgba(3,7,16,.97));
+            border:${retBorder};border-radius:22px;padding:28px 28px 24px;
+            box-shadow:0 2px 8px rgba(0,0,0,.28),0 20px 50px rgba(0,0,0,.52),0 0 0 1px rgba(${retCRGB},.04) inset;
+            display:flex;flex-direction:column;">
+          <div class="entry-shine"></div>
+          <div style="position:absolute;inset:0 0 auto 0;height:2px;border-radius:22px 22px 0 0;
+              background:linear-gradient(90deg,transparent,${retC}cc,${retC}77,transparent);pointer-events:none;"></div>
+          <div style="position:absolute;top:-70px;left:-50px;width:260px;height:220px;
+              background:radial-gradient(circle,rgba(${retCRGB},.06),transparent 65%);pointer-events:none;"></div>
+
+          <!-- centred top section (matches card 3 min-height) -->
+          <div style="min-height:126px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <div style="width:42px;height:42px;border-radius:13px;flex-shrink:0;
+                  background:linear-gradient(135deg,${retIconBg};
+                  box-shadow:0 4px 18px rgba(${retCRGB},.2),inset 0 1px 0 rgba(255,255,255,.07);
+                  display:flex;align-items:center;justify-content:center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 4v14M5 12l7 8 7-8" stroke="${retC}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 21h18" stroke="${retC}" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div style="font-size:10.5px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--muted2);">Total Returned</div>
+            </div>
+            <h2 id="returnVal" style="margin:0;font-size:32px;font-weight:900;letter-spacing:-.7px;line-height:1;
+                background:linear-gradient(135deg,${retAmtGrad});-webkit-background-clip:text;background-clip:text;
+                -webkit-text-fill-color:transparent;filter:drop-shadow(0 0 16px rgba(${retCRGB},.3));">&#8377;0</h2>
+          </div>
+
+          <!-- separator -->
+          <div style="height:1px;margin:20px 0;background:linear-gradient(90deg,transparent,${retC}66,${retC}44,transparent);"></div>
+
+          <!-- TICK LABELS above bar -->
+          <div style="display:flex;justify-content:space-between;padding:0 1px;margin-bottom:7px;">
+            <span style="font-size:9px;font-weight:600;color:var(--muted2);">0%</span>
+            <span style="font-size:9px;font-weight:600;color:var(--muted2);">25%</span>
+            <span style="font-size:9px;font-weight:600;color:var(--muted2);">50%</span>
+            <span style="font-size:9px;font-weight:600;color:var(--muted2);">75%</span>
+            <span style="font-size:9px;font-weight:600;color:var(--muted2);">100%</span>
+          </div>
+
+          <!-- PROGRESS BAR -->
+          <div class="progress-wrap">
+            <div id="progressFillBar" class="progress-fill" style="width:0%;background:${barGrad};
+                box-shadow:0 0 26px ${barGlow},0 0 8px ${barGlow};"></div>
+          </div>
+
+          <!-- HANDWRITING ARROW ANNOTATION — dot sits at the EXACT bar-fill
+               position, refined pen-stroke curve with a natural S-flow,
+               and a perfectly symmetric pill (same padding both sides,
+               regardless of flip direction) so spacing never looks lopsided.
+               Elements start hidden; animateDashboardCharts() below draws
+               the arrow and reveals the pill after the bar settles. -->
+          ${returnPerc > 0 ? `
+          <div style="position:relative;height:80px;margin-top:2px;">
+            <!-- glowing pulse dot — fades in with the arrow -->
+            <div id="arrowDot" style="position:absolute;top:0;left:${returnPerc}%;transform:translateX(-50%);
+                width:10px;height:10px;border-radius:50%;
+                background:${retC};opacity:0;transition:opacity .25s ease;
+                box-shadow:0 0 0 3px rgba(${retCRGB},.22),0 0 14px ${retC};z-index:3;"></div>
+
+            ${flipArrow ? `
+            <!-- FLIPPED: dot near right edge — arrow curves down-LEFT,
+                 pill anchored by its RIGHT edge so it never overflows -->
+            <div style="position:absolute;top:9px;right:calc(100% - ${returnPerc}%);">
+              <svg id="arrowSvgF" width="60" height="42" viewBox="0 0 60 42" fill="none"
+                  style="overflow:visible;display:block;margin-left:-60px;">
+                <path id="arrowPath" d="M54 0 C58 12,44 16,36 24 C28 32,16 34,4 38"
+                  stroke="${retC}" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0"/>
+                <polygon id="arrowHead" points="10,32 0,38 11,42.5" fill="${retC}"
+                  opacity="0" style="transition:opacity .2s ease;"/>
+              </svg>
+              <div id="arrowPillWrap" style="
+                  margin-top:-3px;margin-left:-168px;width:168px;
+                  opacity:0;transform:scale(.85) translateY(-6px);
+                  transition:opacity .3s ease,transform .4s cubic-bezier(.34,1.56,.64,1);
+                  background:linear-gradient(160deg,rgba(7,11,24,.94),rgba(3,6,14,.92));
+                  border:1px solid rgba(${retCRGB},.42);
+                  border-radius:999px;
+                  padding:6px 14px;
+                  display:flex;align-items:center;gap:6px;
+                  box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 18px rgba(${retCRGB},.2),inset 0 1px 0 rgba(255,255,255,.05);
+                  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+                  white-space:nowrap;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+                  <path d="M20 6 9 17l-5-5" stroke="${retC}" stroke-width="3.2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span style="font-size:11.5px;font-weight:800;color:${retC};
+                    font-style:italic;letter-spacing:.2px;
+                    text-shadow:0 0 10px rgba(${retCRGB},.4);">${fmtPerc(returnPerc)}% returned</span>
+              </div>
+            </div>
+            ` : `
+            <!-- NORMAL: dot near left/mid — arrow curves down-RIGHT,
+                 pill anchored by its LEFT edge -->
+            <div style="position:absolute;top:9px;left:${returnPerc}%;">
+              <svg id="arrowSvgN" width="60" height="42" viewBox="0 0 60 42" fill="none"
+                  style="overflow:visible;display:block;">
+                <path id="arrowPath" d="M6 0 C2 12,16 16,24 24 C32 32,44 34,56 38"
+                  stroke="${retC}" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0"/>
+                <polygon id="arrowHead" points="50,32 60,38 49,42.5" fill="${retC}"
+                  opacity="0" style="transition:opacity .2s ease;"/>
+              </svg>
+              <div id="arrowPillWrap" style="
+                  margin-top:-3px;margin-left:6px;width:168px;
+                  opacity:0;transform:scale(.85) translateY(-6px);
+                  transition:opacity .3s ease,transform .4s cubic-bezier(.34,1.56,.64,1);
+                  background:linear-gradient(160deg,rgba(7,11,24,.94),rgba(3,6,14,.92));
+                  border:1px solid rgba(${retCRGB},.42);
+                  border-radius:999px;
+                  padding:6px 14px;
+                  display:flex;align-items:center;gap:6px;
+                  box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 18px rgba(${retCRGB},.2),inset 0 1px 0 rgba(255,255,255,.05);
+                  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+                  white-space:nowrap;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+                  <path d="M20 6 9 17l-5-5" stroke="${retC}" stroke-width="3.2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span style="font-size:11.5px;font-weight:800;color:${retC};
+                    font-style:italic;letter-spacing:.2px;
+                    text-shadow:0 0 10px rgba(${retCRGB},.4);">${fmtPerc(returnPerc)}% returned</span>
+              </div>
+            </div>
+            `}
+          </div>
+          ` : '<div style="height:10px;"></div>'}
+        </div>
+
+        <!-- ══ CARD 3 · BALANCE + donut ══════════════════════════════ -->
+        <div class="dc" style="
+            background:linear-gradient(155deg,rgba(6,11,24,.94),rgba(3,6,15,.97));
+            border:${balBorder};border-radius:22px;padding:28px 22px 24px;
+            box-shadow:0 2px 8px rgba(0,0,0,.28),0 20px 50px rgba(0,0,0,.52),0 0 0 1px rgba(${bcRGB},.04) inset;
+            display:flex;flex-direction:column;align-items:center;text-align:center;">
+          <div class="entry-shine"></div>
+          <div style="position:absolute;inset:0 0 auto 0;height:2px;border-radius:22px 22px 0 0;
+              background:${bline};pointer-events:none;"></div>
+          <div style="position:absolute;top:-70px;left:50%;transform:translateX(-50%);width:250px;height:200px;
+              background:radial-gradient(ellipse,rgba(${bcRGB},.07),transparent 65%);pointer-events:none;"></div>
+
+          <!-- centred top section (matches card 2 min-height) -->
+          <div style="min-height:126px;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;justify-content:center;">
+              <div style="width:42px;height:42px;border-radius:13px;flex-shrink:0;
+                  background:linear-gradient(135deg,${balBg};
+                  box-shadow:0 4px 18px rgba(${bcRGB},.2),inset 0 1px 0 rgba(255,255,255,.07);
+                  display:flex;align-items:center;justify-content:center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  ${bal <= 0
+                    ? `<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="${bc}" stroke-width="2.1" stroke-linecap="round"/><path d="M22 4 12 14.01l-3-3" stroke="${bc}" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>`
+                    : `<path d="M3 6h18M3 12h12M3 18h8" stroke="${bc}" stroke-width="2.1" stroke-linecap="round"/><circle cx="18" cy="17" r="4" stroke="${bc}" stroke-width="2"/><path d="M18 15v2l1 1" stroke="${bc}" stroke-width="1.6" stroke-linecap="round"/>`
+                  }
+                </svg>
+              </div>
+              <div style="font-size:10.5px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--muted2);">Balance</div>
+            </div>
+            <h2 id="remainVal" style="margin:0;font-size:30px;font-weight:900;letter-spacing:-.7px;line-height:1;
+                background:linear-gradient(135deg,${bgc});-webkit-background-clip:text;background-clip:text;
+                -webkit-text-fill-color:transparent;filter:drop-shadow(0 0 16px rgba(${bcRGB},.3));">&#8377;0</h2>
+          </div>
+
+          <!-- separator (same margin as card 2) -->
+          <div style="height:1px;margin:20px 0;width:100%;background:${bline};"></div>
+
+          <!-- DONUT — glow now uses overflow:visible so the blur can render
+               naturally without being clipped by the card's rounded edge -->
+          <div style="position:relative;width:140px;height:140px;flex-shrink:0;">
+            ${bal <= 0 ? `
+              <svg viewBox="0 0 100 100" style="width:140px;height:140px;position:absolute;inset:0;overflow:visible;">
+                <circle cx="50" cy="50" r="${R}" fill="none" stroke="rgba(52,211,153,.1)" stroke-width="8.5" transform="rotate(-90 50 50)"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+                  opacity:0;animation:dashFadeInUp .5s cubic-bezier(.2,.9,.2,1) .3s forwards;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                    style="filter:drop-shadow(0 0 20px rgba(52,211,153,.7));">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M22 4 12 14.01l-3-3" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div style="font-size:13px;font-weight:700;color:#34d399;margin-top:10px;
+                    letter-spacing:.3px;text-shadow:0 0 14px rgba(52,211,153,.55);">All Clear</div>
+              </div>
+            ` : `
+              <!-- GLOW LAYER — overflow:visible so blur renders naturally
+                   instead of being cut off at the card's rounded edge;
+                   reduced stroke-width/blur/opacity so it reads as a soft
+                   halo rather than an overpowering glare -->
+              <svg viewBox="0 0 100 100" style="position:absolute;inset:0;
+                  width:140px;height:140px;overflow:visible;opacity:.2;filter:blur(5px);">
+                <circle id="donutArcGlow" cx="50" cy="50" r="${R}" fill="none" stroke="${bc}"
+                  stroke-width="11" stroke-linecap="round"
+                  stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC}"
+                  transform="rotate(-90 50 50)"/>
+                <!-- start glow cap -->
+                <circle cx="${scX}" cy="${scY}" r="6" fill="${bc}" opacity="0"
+                  style="animation:dashFadeIn .5s ease 1.3s forwards;"/>
+                ${bPerc > 2 && bPerc < 98 ? `<circle cx="${endX}" cy="${endY}" r="6" fill="${bc}" opacity="0"
+                  style="animation:dashFadeIn .5s ease 1.3s forwards;"/>` : ''}
+              </svg>
+              <!-- MAIN RING — crisp, butt ends + explicit caps -->
+              <svg viewBox="0 0 100 100" style="width:140px;height:140px;position:absolute;inset:0;overflow:visible;">
+                <!-- track -->
+                <circle cx="50" cy="50" r="${R}" fill="none"
+                  stroke="rgba(255,255,255,.045)" stroke-width="8.5"
+                  stroke-linecap="butt" transform="rotate(-90 50 50)"/>
+                <!-- arc fill -->
+                <circle id="donutArcMain" cx="50" cy="50" r="${R}" fill="none"
+                  stroke="${bc}" stroke-width="8.5" stroke-linecap="butt"
+                  stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC}"
+                  transform="rotate(-90 50 50)"
+                  style="transition:stroke-dashoffset 1.4s cubic-bezier(.2,.9,.2,1);
+                         filter:drop-shadow(0 0 4px ${bc}88);"/>
+                <!-- start cap circle at 12 o'clock -->
+                <circle cx="${scX}" cy="${scY}" r="4.5" fill="${bc}" opacity="0"
+                  style="filter:drop-shadow(0 0 5px ${bc});animation:dashFadeIn .5s ease 1.3s forwards;"/>
+                <!-- end cap circle — only when arc is between 2% and 98% -->
+                ${bPerc > 2 && bPerc < 98
+                  ? `<circle cx="${endX}" cy="${endY}" r="4.5" fill="${bc}" opacity="0"
+                      style="filter:drop-shadow(0 0 7px ${bc});animation:dashFadeIn .5s ease 1.3s forwards;"/>`
+                  : ''}
+              </svg>
+              <!-- centre face -->
+              <div style="position:absolute;inset:20px;border-radius:50%;
+                  background:linear-gradient(145deg,rgba(4,7,18,.98),rgba(2,4,12,.98));
+                  box-shadow:inset 0 3px 14px rgba(0,0,0,.85);
+                  display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                <div style="font-size:22px;font-weight:900;letter-spacing:-.8px;line-height:1;
+                    color:${bc};text-shadow:0 0 22px ${bc}66;">${fmtPerc(bPerc)}%</div>
+                <div style="font-size:9px;font-weight:700;letter-spacing:.7px;
+                    text-transform:uppercase;color:var(--muted2);margin-top:4px;">${bLabel}</div>
+              </div>
+            `}
+          </div>
+        </div>
+
+      </div>
+    `;
+
+    setTimeout(() => {
+      animateValue('takenVal', taken);
+      animateValue('returnVal', returned);
+      animateValue('remainVal', remaining);
+    }, 100);
+
+    animateDashboardCharts(returnPerc, OFF, CIRC, bal > 0);
+
+    scheduleLayoutUpdate(currentSectionId);
+  }
+
+  document.body.classList.add('booting');
+  populateDatasetSelect();
+  syncControls();
+  updateDatasetInfo();
+  setNavIcons();
+
+  (function displayAppVersion() {
+    const el = document.getElementById('appVersionText');
+    if (!el) return;
+    const ver = (typeof APP_VERSION !== 'undefined' && APP_VERSION) ? APP_VERSION : '03072026_1.0';
+    el.textContent = 'Version ' + ver;
+  })();
+
+  document.querySelectorAll('.section').forEach(section => {
+    const isActive = section.id === 'dashboard';
+    section.classList.toggle('active', isActive);
+    section.classList.remove('leaving');
+    section.style.display = isActive ? 'block' : 'none';
+    section.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+  });
+
+  currentSectionId = 'dashboard';
+  syncNavActive('dashboard');
+  render();
+  scheduleLayoutUpdate('dashboard');
+  window.scrollTo(0, 0);
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => scheduleLayoutUpdate('dashboard')).catch(() => {});
+  }
+
+  requestAnimationFrame(() => {
+    document.body.classList.remove('booting');
+    scheduleLayoutUpdate('dashboard');
+    window.scrollTo(0, 0);
+  });
+
+  window.addEventListener('resize', () => scheduleLayoutUpdate(currentSectionId));
+  window.addEventListener('load', () => {
+    scheduleLayoutUpdate(currentSectionId);
+    window.scrollTo(0, 0);
+  });
+
+  window.__appBooted = true;
+  } catch (bootErr) {
+    if (!window.__datasetError) {
+      window.__datasetError = { message: bootErr && bootErr.message ? bootErr.message : String(bootErr) };
+    }
+    if (window.__showBootError) window.__showBootError();
+  }
+});
+</script>
+</body>
+</html>
